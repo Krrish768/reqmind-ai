@@ -20,3 +20,17 @@ class UserResponse(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+class ProjectCreate(BaseModel):
+    name: str
+    description: str | None = None
+
+class ProjectResponse(BaseModel):
+    id: int
+    name: str
+    description: str | None
+    company_id: int
+    created_by_id: int
+
+    class Config:
+        from_attributes = True
