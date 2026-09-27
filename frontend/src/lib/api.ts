@@ -28,3 +28,23 @@ export async function signupUser(email: string, password: string, companyName: s
 
   return response.json();
 }
+export async function getProjects(token: string) {
+  const response = await fetch(`${API_URL}/projects/`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error("Failed to fetch projects");
+  return response.json();
+}
+
+export async function createProject(token: string, name: string, description: string) {
+  const response = await fetch(`${API_URL}/projects/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ name, description }),
+  });
+  if (!response.ok) throw new Error("Failed to create project");
+  return response.json();
+}
