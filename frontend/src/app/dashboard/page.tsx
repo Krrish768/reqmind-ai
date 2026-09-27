@@ -28,6 +28,11 @@ export default function DashboardPage() {
       });
   }, [router]);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    router.push("/login");
+  };
+
   if (!user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-900 text-white">
@@ -38,7 +43,15 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 p-8 text-white">
-      <h1 className="text-2xl font-bold">Welcome, {user.email}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Welcome, {user.email}</h1>
+        <button
+          onClick={handleLogout}
+          className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold hover:bg-red-700"
+        >
+          Logout
+        </button>
+      </div>
       <p className="mt-2 text-gray-400">Role: {user.role}</p>
     </div>
   );
