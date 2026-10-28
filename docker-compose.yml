@@ -1,4 +1,5 @@
 services:
+  # ---------- default profile: both of you run these ----------
   postgres:
     image: postgres:16
     container_name: reqmind_postgres
@@ -11,5 +12,52 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  minio:
+    image: minio/minio
+    container_name: reqmind_minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: reqmind_minio
+      MINIO_ROOT_PASSWORD: reqmind_minio_pass
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  # ---------- "ai" profile: only Krrish runs these ----------
+  redis:
+    image: redis:7-alpine
+    container_name: reqmind_redis
+    profiles: ["ai"]
+    ports:
+      - "6379:6379"
+
+  qdrant:
+    image: qdrant/qdrant
+    container_name: reqmind_qdrant
+    profiles: ["ai"]
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  neo4j:
+    image: neo4j:5-community
+    container_name: reqmind_neo4j
+    profiles: ["ai"]
+    environment:
+      NEO4J_AUTH: neo4j/reqmind_neo4j_pass
+      NEO4J_server_memory_heap_max__size: 512m
+      NEO4J_server_memory_pagecache_size: 256m
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+
 volumes:
   postgres_data:
+  minio_data:
+  qdrant_data:
+  neo4j_data:
