@@ -1,0 +1,26 @@
+[
+  {
+    "chunk_id": null,
+    "chunk_index": 0,
+    "page": 1,
+    "text": "Campus Canteen Ordering System - Software Requirements\n1. Introduction\nStudents now wait in long queues at the campus canteen during lunch breaks. This document describes a web app that lets them order and pay before they arrive.\n2. Accounts\n- Students shall sign up with their university email address.\n- The system shall lock an account after 5 failed login attempts.\n- A student session shall expire after 15 minutes of inactivity.\n- Passwords must be stored as salted hashes."
+  },
+  {
+    "chunk_id": null,
+    "chunk_index": 1,
+    "page": 1,
+    "text": "3. Ordering\n- Students shall browse the menu by category and see the price of each item.\n- The system shall let a student place an order for pickup at a chosen time slot.\n- A student may cancel an order within 10 minutes of placing it.\n- The canteen staff shall see new orders on a dashboard within 5 seconds.\n- The menu page should be user-friendly and load fast on mobile phones."
+  },
+  {
+    "chunk_id": null,
+    "chunk_index": 2,
+    "page": 2,
+    "text": "4. Payments\n- The system shall accept payments through UPI using the payment gateway.\n- Orders must not be sent to the kitchen until the payment is confirmed.\n- The system should email a receipt to the student after each payment.\n5. Policies\n- An order shall only be cancelled within 5 minutes of placing it, and no refund is given after that.\n- To keep the app secure, a student session shall expire after 30 minutes of inactivity."
+  },
+  {
+    "chunk_id": null,
+    "chunk_index": 3,
+    "page": 2,
+    "text": "6. Quality\n- The system shall support 300 students ordering at the same time.\n- The app shall be available 99.5% of the time during canteen hours.\n- The system must comply with the university data protection policy.\n- The system will keep order history for one academic year for reports.\n7. Glossary\nTime slot: a 15 minute pickup window."
+  }
+]
