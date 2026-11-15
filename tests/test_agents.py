@@ -102,3 +102,14 @@ def test_progress_is_reported_in_order() -> None:
     run_workflow(SAMPLE, use_llm=False, report=lambda percent, _message: seen.append(percent))
     assert seen == sorted(seen)
     assert seen[0] >= 5
+
+
+def test_section_heading_is_not_used_as_title() -> None:
+    chunk_text = "4. Payments\n- The system shall accept payments through UPI."
+    quote = "The system shall accept payments through UPI."
+    assert extraction.checked_title("Payments", quote, chunk_text) == "Accept payments through UPI"
+    assert extraction.checked_title("6. Quality", quote, chunk_text) == "Accept payments through UPI"
+    assert extraction.checked_title("UPI payments", quote, chunk_text) == "UPI payments"
+    long_quote = "The system shall accept payments through UPI using the payment gateway for every order."
+    expected = "Accept payments through UPI using the payment gateway"
+    assert extraction.checked_title(long_quote, long_quote, chunk_text) == expected
