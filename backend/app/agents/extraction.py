@@ -7,10 +7,14 @@ checked items are kept.
 Example:
     python -m backend.app.agents.extraction
 """
+import re
+
 from backend.app.agents import rules
 from backend.app.llm import client as llm
 from backend.app.llm import grounding, prompts
 from backend.app.schemas import ChunkIn, FoundRequirement, LlmExtraction, LlmRequirement
+
+MAX_TITLE_WORDS = 10
 
 
 def grounding_errors(items: list[LlmRequirement], chunk_text: str) -> list[str]:
@@ -25,6 +29,30 @@ def grounding_errors(items: list[LlmRequirement], chunk_text: str) -> list[str]:
     return errors
 
 
+def _words(text: str) -> set[str]:
+    """Lowercase words of 3 or more letters."""
+    return set(re.findall(r"[a-z]{3,}", text.lower()))
+
+
+def heading_lines(chunk_text: str) -> set[str]:
+    """Normalized lines without a modal verb, like "4. Payments" -> "payments"."""
+    lines = (rules.BULLET_PREFIX.sub("", line) for line in chunk_text.splitlines())
+    return {grounding.normalize(line) for line in lines if line.strip() and not rules.strongest_modal(line)}
+
+
+def checked_title(title: str, quote: str, chunk_text: str) -> str:
+    """Keep the LLM title only if it has 2 to MAX_TITLE_WORDS words, shares a word with the quote
+    and is not a heading.
+
+    Otherwise make the title from the quote with the text rules.
+    """
+    clean = title.strip()
+    is_heading = grounding.normalize(rules.BULLET_PREFIX.sub("", clean)) in heading_lines(chunk_text)
+    if not 2 <= len(clean.split()) <= MAX_TITLE_WORDS or is_heading or not _words(clean) & _words(quote):
+        return rules.make_title(quote)
+    return clean
+
+
 def to_found(item: LlmRequirement, chunk: ChunkIn) -> FoundRequirement:
     """Turn a checked LLM item into a FoundRequirement.
 
@@ -34,7 +62,7 @@ def to_found(item: LlmRequirement, chunk: ChunkIn) -> FoundRequirement:
     notes = [note for note in (item.ambiguity_note if item.is_ambiguous else None, rules.vague_note(vague)) if note]
     entities = [grounding.normalize(entity) for entity in item.entities if grounding.entity_in_text(entity, chunk.text)]
     return FoundRequirement(
-        title=item.title.strip(),
+        title=checked_title(item.title, item.source_quote, chunk.text),
         description=item.description.strip(),
         type=item.type,
         category=item.category,
