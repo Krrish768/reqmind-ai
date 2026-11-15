@@ -1,5 +1,34 @@
+# Services for ReqMind AI.
+#
+#   docker compose up -d                              Postgres + MinIO (enough with configs/cpu_laptop.yaml)
+#   docker compose --profile ai up -d                 + Redis, Qdrant, Neo4j (configs/gpu_laptop.yaml)
+#   docker compose --profile app up -d --build        everything, with the API and the worker in containers
+#                                                     (configs/docker.yaml)
+#
+# Ollama is not in here: it runs on the host and the containers reach it at host.docker.internal.
+
+x-app: &app
+  build: .
+  image: reqmind-ai:latest
+  environment:
+    APP_CONFIG: docker
+    DATABASE_URL: postgresql+psycopg2://reqmind_user:reqmind_pass@postgres:5432/reqmind_db
+    JWT_SECRET_KEY: ${JWT_SECRET_KEY:?Set JWT_SECRET_KEY in .env}
+    NEO4J_PASSWORD: reqmind_neo4j_pass
+    MINIO_ACCESS_KEY: reqmind_minio
+    MINIO_SECRET_KEY: reqmind_minio_pass
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  depends_on:
+    - postgres
+    - minio
+    - redis
+    - qdrant
+    - neo4j
+  restart: unless-stopped
+
 services:
-  # ---------- default profile: both of you run these ----------
+  # ---------- default: needed on every machine ----------
   postgres:
     image: postgres:16
     container_name: reqmind_postgres
@@ -25,18 +54,18 @@ services:
     volumes:
       - minio_data:/data
 
-  # ---------- "ai" profile: only Krrish runs these ----------
+  # ---------- profile "ai" (and "app"): queue, vector search, graph ----------
   redis:
     image: redis:7-alpine
     container_name: reqmind_redis
-    profiles: ["ai"]
+    profiles: ["ai", "app"]
     ports:
       - "6379:6379"
 
   qdrant:
     image: qdrant/qdrant
     container_name: reqmind_qdrant
-    profiles: ["ai"]
+    profiles: ["ai", "app"]
     ports:
       - "6333:6333"
     volumes:
@@ -45,9 +74,10 @@ services:
   neo4j:
     image: neo4j:5-community
     container_name: reqmind_neo4j
-    profiles: ["ai"]
+    profiles: ["ai", "app"]
     environment:
       NEO4J_AUTH: neo4j/reqmind_neo4j_pass
+      # small limits so it fits next to the LLM on a 16 GB laptop
       NEO4J_server_memory_heap_max__size: 512m
       NEO4J_server_memory_pagecache_size: 256m
     ports:
@@ -55,6 +85,22 @@ services:
       - "7687:7687"
     volumes:
       - neo4j_data:/data
+
+  # ---------- profile "app": the API and the worker in containers ----------
+  backend:
+    <<: *app
+    container_name: reqmind_backend
+    profiles: ["app"]
+    ports:
+      - "8000:8000"
+
+  worker:
+    <<: *app
+    container_name: reqmind_worker
+    profiles: ["app"]
+    command: ["python", "-m", "scripts.run_worker"]
+    healthcheck:
+      disable: true
 
 volumes:
   postgres_data:
