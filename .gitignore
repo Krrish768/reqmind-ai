@@ -1,7 +1,19 @@
+# Python
+.venv/
 venv/
 __pycache__/
 *.pyc
+.pytest_cache/
+
+# Secrets and local settings
 .env
+
+# Logs and editor folders
+*.log
+.vscode/
+.idea/
+.DS_Store
+
+# Frontend build output
 node_modules/
 .next/
-*.log
