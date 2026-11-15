@@ -1,54 +1,76 @@
+"""All shared data formats: API requests and responses, LLM outputs, sample files.
+
+The frontend reads the same field names, so a change here is told to the other
+teammate first and made in one small commit.
+"""
 from datetime import datetime
 from typing import Literal
-from pydantic import BaseModel, EmailStr
 
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
+
+RequirementType = Literal["functional", "non_functional", "constraint"]
+Priority = Literal["high", "medium", "low"]
+ReqStatus = Literal["draft", "approved", "rejected"]
+Category = Literal["security", "performance", "usability", "data", "ui", "integration", "reliability", "other"]
+JobStatus = Literal["queued", "running", "done", "failed"]
+
+
+class OrmModel(BaseModel):
+    """Base for responses built from database rows."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+# ---------- Auth and projects ----------
 class UserCreate(BaseModel):
     email: EmailStr
-    password: str
-    company_name: str
+    password: str = Field(min_length=6)
+    company_name: str = Field(min_length=1)
+
 
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
-class UserResponse(BaseModel):
+
+class UserResponse(OrmModel):
     id: int
     email: EmailStr
     role: str
+    company_id: int
 
-    class Config:
-        from_attributes = True
 
 class Token(BaseModel):
     access_token: str
     token_type: str
 
+
 class ProjectCreate(BaseModel):
-    name: str
+    name: str = Field(min_length=1)
     description: str | None = None
 
-class ProjectResponse(BaseModel):
+
+class ProjectResponse(OrmModel):
     id: int
     name: str
     description: str | None
     company_id: int
     created_by_id: int
 
-    class Config:
-        from_attributes = True
-
-
-# =====================================================================
-# SHARED CONTRACT (Step 0) - API request/response shapes.
-# Frontend types (frontend/src/lib/types.ts) must mirror these.
-# =====================================================================
 
 class ProjectDetail(ProjectResponse):
     created_at: datetime | None = None
 
 
+class HealthResponse(BaseModel):
+    status: str
+    database: str
+    config: str
+    ai_enabled: bool
+
+
 # ---------- Documents (Muskaan) ----------
-class DocumentResponse(BaseModel):
+class DocumentResponse(OrmModel):
     id: int
     project_id: int
     filename: str
@@ -58,27 +80,25 @@ class DocumentResponse(BaseModel):
     error: str | None
     created_at: datetime | None
 
-    class Config:
-        from_attributes = True
 
-
-class ChunkResponse(BaseModel):
+class ChunkResponse(OrmModel):
     id: int
     document_id: int
     chunk_index: int
     text: str
     page: int | None
 
-    class Config:
-        from_attributes = True
+
+class ChunkIn(BaseModel):
+    """One text chunk given to the analysis. Same format as samples/chunks.json."""
+
+    chunk_id: int | None = None
+    chunk_index: int
+    text: str
+    page: int | None = None
 
 
 # ---------- Requirements (both write, Muskaan owns the API) ----------
-RequirementType = Literal["functional", "non_functional", "constraint"]
-Priority = Literal["high", "medium", "low"]
-ReqStatus = Literal["draft", "approved", "rejected"]
-
-
 class RequirementCreate(BaseModel):
     title: str
     description: str
@@ -100,7 +120,7 @@ class RequirementUpdate(BaseModel):
     entities: list[str] | None = None
 
 
-class RequirementResponse(BaseModel):
+class RequirementResponse(OrmModel):
     id: int
     project_id: int
     document_id: int | None
@@ -120,35 +140,28 @@ class RequirementResponse(BaseModel):
     created_at: datetime | None
     updated_at: datetime | None
 
-    class Config:
-        from_attributes = True
 
-
-# ---------- AI side (Krrish) ----------
-class JobResponse(BaseModel):
+# ---------- Analysis, conflicts, graph, chat (Krrish) ----------
+class JobResponse(OrmModel):
     id: int
     project_id: int
     document_id: int
-    status: str            # queued | running | done | failed
-    progress: int          # 0..100
+    status: JobStatus
+    progress: int
     message: str | None
+    created_at: datetime | None = None
+    finished_at: datetime | None = None
 
-    class Config:
-        from_attributes = True
 
-
-class ConflictResponse(BaseModel):
+class ConflictResponse(OrmModel):
     id: int
     requirement_a_id: int
     requirement_b_id: int
     reason: str
 
-    class Config:
-        from_attributes = True
-
 
 class GraphNode(BaseModel):
-    id: str                # "req:12", "ent:payment gateway", "doc:3"
+    id: str  # "req:12", "ent:payment gateway", "doc:3"
     label: str
     type: Literal["requirement", "entity", "document"]
     data: dict = {}
@@ -157,16 +170,17 @@ class GraphNode(BaseModel):
 class GraphEdge(BaseModel):
     source: str
     target: str
-    type: str              # MENTIONS | CONFLICTS_WITH | SOURCE_OF
+    type: Literal["MENTIONS", "CONFLICTS_WITH", "SOURCE_OF"]
 
 
 class GraphResponse(BaseModel):
     nodes: list[GraphNode]
     edges: list[GraphEdge]
+    source: Literal["neo4j", "database"]
 
 
 class ChatRequest(BaseModel):
-    question: str
+    question: str = Field(min_length=1, max_length=1000)
 
 
 class ChatSource(BaseModel):
@@ -179,3 +193,56 @@ class ChatSource(BaseModel):
 class ChatResponse(BaseModel):
     answer: str
     sources: list[ChatSource]
+    method: Literal["llm", "template"]
+
+
+# ---------- LLM outputs (JSON schema given to Ollama) ----------
+class LlmRequirement(BaseModel):
+    title: str = Field(description="Short name, at most 8 words")
+    description: str = Field(description="The requirement in one clear sentence")
+    type: RequirementType
+    category: Category
+    source_quote: str = Field(description="The exact sentence from the text this requirement comes from")
+    entities: list[str] = Field(description="Nouns from the text: actors, systems, data. Lowercase.")
+    is_ambiguous: bool
+    ambiguity_note: str | None = Field(description="Which words are vague, or null")
+
+
+class LlmExtraction(BaseModel):
+    requirements: list[LlmRequirement]
+
+
+class LlmConflictVerdict(BaseModel):
+    is_conflict: bool
+    reason: str = Field(description="One sentence. Use only facts from the two requirements.")
+
+
+class LlmChatAnswer(BaseModel):
+    answer: str = Field(description="Answer using only the numbered passages")
+    passage_numbers: list[int] = Field(description="Numbers of the passages the answer uses")
+
+
+# ---------- Analysis results inside the backend ----------
+class FoundRequirement(BaseModel):
+    """A requirement found in one chunk, before it is saved."""
+
+    title: str
+    description: str
+    type: RequirementType
+    category: str | None
+    priority: Priority
+    source_quote: str
+    entities: list[str]
+    is_ambiguous: bool
+    ambiguity_note: str | None
+    chunk_index: int
+    chunk_id: int | None
+    method: Literal["llm", "rules"]
+
+
+class FoundConflict(BaseModel):
+    """Two requirements (positions in the found list) that contradict each other."""
+
+    index_a: int
+    index_b: int
+    reason: str
