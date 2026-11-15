@@ -42,7 +42,9 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   minio:
-    image: minio/minio
+    # Silo: community fork of MinIO, same API and MINIO_* variables. The official
+    # minio/minio image was removed from Docker Hub in 2026.
+    image: pgsty/silo:RELEASE.2026-09-16T00-00-00Z
     container_name: reqmind_minio
     command: server /data --console-address ":9001"
     environment:
