@@ -1,7 +1,20 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text, Boolean, Float, JSON
+"""Database tables. Changing a column means telling the other teammate first."""
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from app.database import Base
+
+from backend.app.database import Base
+
 
 class Company(Base):
     __tablename__ = "companies"
@@ -39,13 +52,10 @@ class Project(Base):
     created_by = relationship("User")
 
 
-# =====================================================================
-# SHARED CONTRACT (Step 0). Do NOT change columns without telling the
-# other person. Any change = its own commit starting with "contract:".
-# =====================================================================
+# Shared tables. Do not change columns without telling the other teammate.
 
 class Document(Base):
-    """Owner: Muskaan (creates rows on upload). Krrish only updates `status`."""
+    """Owner: Muskaan (creates rows on upload). Krrish only updates `status` and `error`."""
     __tablename__ = "documents"
 
     id = Column(Integer, primary_key=True, index=True)
