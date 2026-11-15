@@ -1,55 +1,64 @@
+"""Password hashing, JWT tokens and the current-user dependency."""
+from datetime import datetime, timedelta, timezone
+
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import JWTError, jwt
 from passlib.context import CryptContext
-from jose import jwt
-from datetime import datetime, timedelta
-from dotenv import load_dotenv
-import os
+from sqlalchemy.orm import Session
 
-load_dotenv()
+from backend.app import models
+from backend.app.config import settings
+from backend.app.database import get_db
 
-SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+bearer_scheme = HTTPBearer()
+
 
 def hash_password(password: str) -> str:
+    """Hash a password with bcrypt."""
     return pwd_context.hash(password)
 
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Check a password against its bcrypt hash."""
     return pwd_context.verify(plain_password, hashed_password)
 
-def create_access_token(data: dict):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError
-from sqlalchemy.orm import Session
-from app.database import get_db
-from app import models
 
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+def create_access_token(email: str, user_id: int) -> str:
+    """Make a signed JWT that expires after ACCESS_TOKEN_EXPIRE_MINUTES.
 
-security_scheme = HTTPBearer()
+    Args:
+        email: Stored in the "sub" claim and used to find the user later.
+        user_id: Stored for convenience.
 
-def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security_scheme), db: Session = Depends(get_db)):
-    token = credentials.credentials
-    credentials_exception = HTTPException(
+    Returns:
+        The encoded token.
+    """
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    payload = {"sub": email, "user_id": user_id, "exp": expire}
+    return jwt.encode(payload, settings.jwt_secret_key, algorithm=ALGORITHM)
+
+
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    db: Session = Depends(get_db),
+) -> models.User:
+    """Return the user from the Bearer token, or answer 401."""
+    unauthorized = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="Your session is not valid. Please log in again.",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
-            raise credentials_exception
+        payload = jwt.decode(credentials.credentials, settings.jwt_secret_key, algorithms=[ALGORITHM])
     except JWTError:
-        raise credentials_exception
-
-    user = db.query(models.User).filter(models.User.email == email).first()
+        raise unauthorized
+    email = payload.get("sub")
+    user = db.query(models.User).filter(models.User.email == email).first() if email else None
     if user is None:
-        raise credentials_exception
+        raise unauthorized
     return user
