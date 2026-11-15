@@ -1,0 +1,35 @@
+# Python 3.12. Install with: pip install -r requirements.txt
+# Exact versions so both machines run the same code.
+
+# ---------- Shared: web, database, auth, config ----------
+fastapi==0.163.0
+uvicorn[standard]==0.54.0
+SQLAlchemy==2.1.8
+psycopg2-binary==2.9.13
+pydantic==2.14.3
+email-validator==2.4.0
+python-dotenv==1.2.4
+PyYAML==6.0.3
+passlib[bcrypt]==1.7.4
+# passlib 1.7.4 breaks with bcrypt 4.1 and later
+bcrypt==4.0.1
+python-jose[cryptography]==3.5.0
+python-multipart==0.0.33
+tqdm==4.70.1
+pytest==9.2.0
+httpx==0.28.1
+
+# ---------- Krrish: LLM, agents, search, graph, jobs ----------
+ollama==0.6.3
+langgraph==1.2.22
+qdrant-client==1.20.0
+neo4j==6.4.1
+redis==8.1.0
+rq==3.0.0
+numpy==2.5.4
+
+# ---------- Muskaan: file storage, parsing, export ----------
+minio==7.2.20
+pypdf==7.1.0
+python-docx==1.2.0
+reportlab==5.1.0
