@@ -5,6 +5,7 @@ Rules:
 - Only list requirements that are written in the text. Do not invent any.
 - source_quote must be copied word for word from the text: one full sentence or bullet.
 - One requirement per source sentence. Skip headings, background and examples.
+- title names this one requirement in 3 to 8 words taken from its sentence. Never use the section heading as the title.
 - entities are short lowercase nouns that appear in the text (actors, systems, data).
 - type: functional (what the system does), non_functional (how well: speed, security, uptime),
   constraint (fixed limits: technology, law, budget).
