@@ -1,21 +1,23 @@
-"""OWNER: Krrish. Step 0 stub with MOCK response (shape is final)."""
+"""Ask a question about a project's documents."""
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from app.database import get_db
-from app import models, schemas, security
-from app.config import settings
-from app.deps import get_project_or_404
+
+from backend.app import models, schemas
+from backend.app.api.deps import get_project_or_404
+from backend.app.database import get_db
+from backend.app.rag.chat import answer_question
+from backend.app.security import get_current_user
 
 router = APIRouter(tags=["Chat"])
 
 
 @router.post("/projects/{project_id}/chat", response_model=schemas.ChatResponse)
-def chat(project_id: int, body: schemas.ChatRequest,
-         current_user: models.User = Depends(security.get_current_user),
-         db: Session = Depends(get_db)):
-    get_project_or_404(db, project_id, current_user)
-    if not settings.AI_ENABLED:
-        return {"answer": f"(mock) AI is disabled on this machine. You asked: {body.question}",
-                "sources": [{"document_id": 1, "filename": "sample_srs.pdf", "chunk_index": 0,
-                             "text": "The system shall allow users to log in with email and password."}]}
-    raise NotImplementedError("Krrish: K6")
+def chat(
+    project_id: int,
+    body: schemas.ChatRequest,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> schemas.ChatResponse:
+    """Answer from the project's passages, with the passages used as sources."""
+    project = get_project_or_404(db, project_id, current_user)
+    return answer_question(db, project, body.question.strip())
