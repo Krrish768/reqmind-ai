@@ -1,0 +1,48 @@
+# Used inside the containers from docker-compose.yml (profile "app").
+# Service names replace localhost. Ollama stays on the host.
+ai_enabled: true
+seed: 42
+cors_origins: []
+
+ollama:
+  # localhost inside a container is the container itself
+  host: http://host.docker.internal:11434
+  llm_model: qwen3:8b
+  embed_model: nomic-embed-text
+  num_ctx: 4096
+  timeout_seconds: 300
+  keep_alive: 10m
+
+redis:
+  enabled: true
+  url: redis://redis:6379/0
+  queue_name: analysis
+
+qdrant:
+  enabled: true
+  url: http://qdrant:6333
+  collection: reqmind_chunks
+
+neo4j:
+  enabled: true
+  uri: bolt://neo4j:7687
+  user: neo4j
+
+minio:
+  endpoint: minio:9000
+  bucket: reqmind-documents
+  secure: false
+
+ingestion:
+  max_upload_mb: 10
+  chunk_chars: 1200
+  overlap_chars: 150
+
+analysis:
+  max_chunks: 40
+  conflict_similarity: 0.80
+  max_conflict_pairs: 30
+  job_timeout_seconds: 3600
+
+chat:
+  top_k: 5
