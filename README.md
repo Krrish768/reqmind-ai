@@ -349,7 +349,7 @@ Hand-label 5–10 public SRS documents (requirements and planted conflicts). Com
 | Search | Qdrant |
 | Graph | Neo4j 5 Community |
 | Jobs | Redis + RQ |
-| Database and files | Postgres 16, MinIO |
+| Database and files | Postgres 16, Silo (a MinIO fork, same S3 API) |
 | Packaging | Docker, Docker Compose |
 | Tests | pytest |
 
@@ -457,6 +457,7 @@ Analysis and chat times: TBD. Minimum: any machine with Docker for `cpu_laptop`;
 | `missing models` from check_services | `python -m scripts.download_weights` |
 | Ollama out of memory | Lower `ollama.num_ctx`, close other GPU programs |
 | Container cannot reach Ollama | Set `OLLAMA_HOST=0.0.0.0` for the Ollama service (see Docker section) |
+| `pull access denied for minio/minio` | The official image is gone; `docker-compose.yml` uses `pgsty/silo`. Run `git pull` |
 | Port already in use | `docker compose down`, or stop the other program on that port |
 | Graph `source` is `database` | Neo4j is off or down; `docker compose --profile ai up -d neo4j` |
 
