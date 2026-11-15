@@ -1,0 +1,19 @@
+# Every model the project downloads. Ollama keeps its own copies (~/.ollama),
+# so nothing is stored in this repo. Fetch them with:
+#   python -m scripts.download_weights
+
+krrish:
+  - name: qwen3:8b
+    kind: ollama
+    size: 5.2 GB
+    url: https://ollama.com/library/qwen3
+    source: Qwen team, Alibaba Cloud
+    licence: Apache-2.0
+  - name: nomic-embed-text
+    kind: ollama
+    size: 274 MB
+    url: https://ollama.com/library/nomic-embed-text
+    source: Nomic AI
+    licence: Apache-2.0
+
+muskaan: []
