@@ -1,0 +1,50 @@
+# Laptop without Ollama. Requirements are found with simple text rules instead
+# of the LLM, chat shows the best matching passages, and the graph is built from
+# Postgres. Only Postgres and MinIO are needed: `docker compose up -d`.
+ai_enabled: false
+seed: 42
+cors_origins:
+  - http://localhost:5500
+  - http://127.0.0.1:5500
+
+ollama:
+  host: http://localhost:11434
+  llm_model: qwen3:8b
+  embed_model: nomic-embed-text
+  num_ctx: 4096
+  timeout_seconds: 300
+  keep_alive: 10m
+
+redis:
+  enabled: false
+  url: redis://localhost:6379/0
+  queue_name: analysis
+
+qdrant:
+  enabled: false
+  url: http://localhost:6333
+  collection: reqmind_chunks
+
+neo4j:
+  enabled: false
+  uri: bolt://localhost:7687
+  user: neo4j
+
+minio:
+  endpoint: localhost:9000
+  bucket: reqmind-documents
+  secure: false
+
+ingestion:
+  max_upload_mb: 10
+  chunk_chars: 1200
+  overlap_chars: 150
+
+analysis:
+  max_chunks: 40
+  conflict_similarity: 0.80
+  max_conflict_pairs: 30
+  job_timeout_seconds: 3600
+
+chat:
+  top_k: 5
