@@ -2,8 +2,8 @@
 
 Passages come from Qdrant (vector search) or, when that is not available,
 from a simple keyword search in Postgres. The LLM writes the answer only from
-the numbered passages, and the answer is checked: the passage numbers must
-exist and every number in the answer must appear in the passages. If the
+the passages (labelled A, B, C ...), and the answer is checked: the passage
+letters must exist and every number in the answer must appear in the passages. If the
 check fails twice, or the LLM is off, a fixed template lists the passages.
 """
 import re
@@ -65,12 +65,18 @@ def find_passages(db: Session, project: models.Project, question: str) -> list[d
     return keyword_search(db, project, question, top_k)
 
 
+def clean_letter(label: str) -> str:
+    """"passage b " -> "B"."""
+    return label.strip().upper().removeprefix("PASSAGE").strip()
+
+
 def answer_errors(answer: LlmChatAnswer, passages: list[dict]) -> list[str]:
     """Problems that make the answer untrustworthy."""
     errors = []
-    bad_numbers = [number for number in answer.passage_numbers if not 1 <= number <= len(passages)]
-    if bad_numbers:
-        errors.append(f"Passage numbers that do not exist: {bad_numbers}")
+    letters = list(prompts.PASSAGE_LETTERS[: len(passages)])
+    bad_letters = [label for label in answer.passages if clean_letter(label) not in letters]
+    if bad_letters:
+        errors.append(f"Passage letters must be from {letters}, got {bad_letters}")
     facts = " ".join(passage["text"] for passage in passages)
     missing = grounding.unsupported_numbers(answer.answer, facts)
     if missing:
@@ -80,7 +86,7 @@ def answer_errors(answer: LlmChatAnswer, passages: list[dict]) -> list[str]:
 
 def ask_llm(question: str, passages: list[dict]) -> LlmChatAnswer | None:
     """LLM answer that passed the checks (one retry), or None."""
-    context = prompts.numbered_passages([passage["text"] for passage in passages])
+    context = prompts.labelled_passages([passage["text"] for passage in passages])
     errors: list[str] = []
     for _attempt in range(2):
         user_prompt = f"Passages:\n{context}\n\nQuestion: {question}"
@@ -116,5 +122,6 @@ def answer_question(db: Session, project: models.Project, question: str) -> Chat
         answer = None
     if answer is None:
         return ChatResponse(answer=TEMPLATE_UNCHECKED, sources=to_sources(passages), method="template")
-    used = [passages[number - 1] for number in sorted(set(answer.passage_numbers))]
+    positions = sorted({prompts.PASSAGE_LETTERS.index(clean_letter(label)) for label in answer.passages})
+    used = [passages[position] for position in positions]
     return ChatResponse(answer=answer.answer, sources=to_sources(used), method="llm")
