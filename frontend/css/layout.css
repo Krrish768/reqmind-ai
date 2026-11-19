@@ -1,0 +1,106 @@
+/* Page frame: background, top bar, containers, motion. */
+
+@property --field-a { syntax: "<color>"; inherits: true; initial-value: #eadfcb; }
+@property --field-b { syntax: "<color>"; inherits: true; initial-value: #dcebe3; }
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: var(--size-m);
+  line-height: 1.55;
+  overflow-x: hidden;
+  transition: --field-a 900ms var(--ease), --field-b 900ms var(--ease);
+}
+
+/* two large, slow colour fields that take the colour of the current section */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -20vmax;
+  z-index: -2;
+  background:
+    radial-gradient(40vmax 30vmax at 12% 8%, var(--field-a), transparent 70%),
+    radial-gradient(45vmax 35vmax at 92% 85%, var(--field-b), transparent 70%);
+  opacity: 0.75;
+  animation: drift 40s ease-in-out infinite alternate;
+}
+/* very light paper grain */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.3 0 0 0 0 0.22 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@keyframes drift { to { transform: translate3d(2vmax, -1.5vmax, 0) rotate(2deg); } }
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; line-height: 1.15; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: var(--size-xxl); }
+h2 { font-size: var(--size-xl); }
+h3 { font-size: var(--size-l); }
+em.accent { font-family: var(--font-display); font-style: italic; font-weight: 400; }
+p { margin: 0; }
+a { color: var(--entity); text-underline-offset: 3px; }
+code, .mono { font-family: var(--font-mono); font-size: 0.92em; }
+:focus-visible { outline: none; box-shadow: var(--focus); border-radius: var(--radius-s); }
+
+/* top bar */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--paper) 80%, transparent);
+  border-bottom: 1px solid var(--rule);
+}
+.topbar-inner {
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: var(--space-3) var(--gutter);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.wordmark {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  color: var(--ink);
+  text-decoration: none;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.wordmark span { font-style: italic; font-weight: 400; color: var(--functional); }
+.crumbs { flex: 1; min-width: 0; color: var(--ink-faint); font-size: var(--size-s); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.crumbs a { color: var(--ink-soft); text-decoration: none; }
+.crumbs a:hover { color: var(--ink); text-decoration: underline; }
+.topbar-actions { display: flex; align-items: center; gap: var(--space-3); font-size: var(--size-s); }
+.user-email { color: var(--ink-faint); max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.page { max-width: var(--page-width); margin: 0 auto; padding: var(--space-6) var(--gutter) var(--space-7); }
+.page-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-5); }
+.page-head p { color: var(--ink-soft); max-width: 60ch; margin-top: var(--space-2); }
+.stack > * + * { margin-top: var(--space-4); }
+
+/* scroll reveal, both directions */
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity 500ms var(--ease), transform 500ms var(--ease); }
+.reveal.is-visible { opacity: 1; transform: none; }
+
+@media (max-width: 640px) {
+  .user-email { display: none; }
+  .page { padding-top: var(--space-5); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1; transform: none; }
+}
