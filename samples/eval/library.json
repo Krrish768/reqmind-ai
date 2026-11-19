@@ -1,0 +1,128 @@
+{
+ "name": "library",
+ "title": "Library Book Booking App",
+ "lines": [
+  {
+   "text": "Library Book Booking App - Requirements",
+   "id": null
+  },
+  {
+   "text": "1. Purpose",
+   "id": null
+  },
+  {
+   "text": "Students often walk to the library only to find the book is already issued. This app lets them reserve books online.",
+   "id": null
+  },
+  {
+   "text": "2. Users and login",
+   "id": null
+  },
+  {
+   "text": "- Students shall log in with their university email and password.",
+   "id": "L1",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- The system shall lock an account after 3 failed login attempts.",
+   "id": "L2",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- Librarians must be able to add, edit and remove books from the catalogue.",
+   "id": "L3",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "3. Booking",
+   "id": null
+  },
+  {
+   "text": "- A student shall reserve at most 3 books at the same time.",
+   "id": "L4",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- A reserved book shall be held for 24 hours before the reservation expires.",
+   "id": "L5",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- A student may reserve up to 5 books at one time during exam weeks.",
+   "id": "L6",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- The system should send an email reminder 2 days before the due date.",
+   "id": "L7",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- A reserved book shall be held for 48 hours if the student is a final-year student.",
+   "id": "L8",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "4. Quality",
+   "id": null
+  },
+  {
+   "text": "- Search results shall appear within 2 seconds for 500 users at the same time.",
+   "id": "L9",
+   "type": "non_functional",
+   "vague": false
+  },
+  {
+   "text": "- The app should be easy to use and look modern.",
+   "id": "L10",
+   "type": "non_functional",
+   "vague": true
+  },
+  {
+   "text": "- The system must store all data on university servers only.",
+   "id": "L11",
+   "type": "constraint",
+   "vague": false
+  },
+  {
+   "text": "- The app shall be available 99% of the time during library hours.",
+   "id": "L12",
+   "type": "non_functional",
+   "vague": false
+  }
+ ],
+ "conflicts": [],
+ "lookalikes": [
+  [
+   "L4",
+   "L6"
+  ],
+  [
+   "L5",
+   "L8"
+  ]
+ ],
+ "questions": [
+  {
+   "question": "How many books can a student reserve at the same time?",
+   "expect_any": [
+    "3"
+   ]
+  },
+  {
+   "question": "How long is a reserved book held?",
+   "expect_any": [
+    "24",
+    "48"
+   ]
+  }
+ ]
+}
