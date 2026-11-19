@@ -230,9 +230,11 @@ Docker status:
 | `docker compose config -q` (both profiles) | Yes |
 | `docker compose build backend` | Yes, image 1.1 GB |
 | Services only (`--profile ai`) with the API on the host | Yes, this is how all results were made |
-| Backend and worker inside containers (`--profile app`) | Not tested yet |
+| Backend and worker inside containers (`--profile app`) | Yes: healthy, all services reachable from inside the container, Ollama on the host included |
+| Full user flow against the containers | Yes: sign-up, upload, LLM analysis (19 requirements, 2 conflicts, 139 s), graph from Neo4j, chat, edit, export to Markdown, Word and PDF, delete |
+| Data kept after `docker compose --profile app down` and `up` | Yes |
 
-To test the last row, run the commands in step 4, then upload a file on http://localhost:8000, press Analyze and check `docker compose logs -f worker` for the finished job.
+The last three rows were tested on 19 November 2026 on the HP Victus laptop (RTX 4060).
 
 ## Models
 
