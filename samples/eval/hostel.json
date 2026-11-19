@@ -1,0 +1,119 @@
+{
+ "name": "hostel",
+ "title": "Hostel Complaint Portal",
+ "lines": [
+  {
+   "text": "Hostel Complaint Portal - Requirements",
+   "id": null
+  },
+  {
+   "text": "1. Why this portal",
+   "id": null
+  },
+  {
+   "text": "Students write complaints in a register that wardens rarely check.",
+   "id": null
+  },
+  {
+   "text": "2. Complaints",
+   "id": null
+  },
+  {
+   "text": "- Students shall raise a complaint with a category, a description and an optional photo.",
+   "id": "K1",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- Each complaint shall get a ticket number.",
+   "id": "K2",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- The warden must reply to a complaint within 48 hours.",
+   "id": "K3",
+   "type": "non_functional",
+   "vague": false
+  },
+  {
+   "text": "- Students should be able to track the status of their complaint.",
+   "id": "K4",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- Photos larger than 5 MB are rejected.",
+   "id": "K5",
+   "type": "constraint",
+   "vague": false
+  },
+  {
+   "text": "- The warden must reply to a complaint within 24 hours.",
+   "id": "K6",
+   "type": "non_functional",
+   "vague": false
+  },
+  {
+   "text": "- Urgent complaints such as water leaks shall be shown at the top of the list.",
+   "id": "K7",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- Students may stay anonymous when they raise a complaint about staff.",
+   "id": "K12",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "3. Quality",
+   "id": null
+  },
+  {
+   "text": "- The portal should be user-friendly for first-year students.",
+   "id": "K8",
+   "type": "non_functional",
+   "vague": true
+  },
+  {
+   "text": "- The portal shall work on Android and iOS browsers.",
+   "id": "K9",
+   "type": "constraint",
+   "vague": false
+  },
+  {
+   "text": "- Complaint data shall be kept for 2 years.",
+   "id": "K10",
+   "type": "non_functional",
+   "vague": false
+  },
+  {
+   "text": "- The portal must support 1000 students at the same time.",
+   "id": "K11",
+   "type": "non_functional",
+   "vague": false
+  }
+ ],
+ "conflicts": [
+  [
+   "K3",
+   "K6"
+  ]
+ ],
+ "lookalikes": [],
+ "questions": [
+  {
+   "question": "What is the size limit for photos?",
+   "expect_any": [
+    "5"
+   ]
+  },
+  {
+   "question": "Can a student stay anonymous?",
+   "expect_any": [
+    "anonymous"
+   ]
+  }
+ ]
+}
