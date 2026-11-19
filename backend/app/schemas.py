@@ -218,8 +218,8 @@ class LlmConflictVerdict(BaseModel):
 
 
 class LlmChatAnswer(BaseModel):
-    answer: str = Field(description="Answer using only the numbered passages")
-    passage_numbers: list[int] = Field(description="Numbers of the passages the answer uses")
+    answer: str = Field(description="Answer using only the passages")
+    passages: list[str] = Field(description='Letters of the passages the answer uses, like ["A", "C"]')
 
 
 # ---------- Analysis results inside the backend ----------
