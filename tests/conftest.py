@@ -124,7 +124,7 @@ def fake_chat_json(system_prompt: str, user_prompt: str, schema: type) -> object
     if schema is LlmConflictVerdict:
         return LlmConflictVerdict(is_conflict=True, reason="Both set a different limit for the same thing.")
     if schema is LlmChatAnswer:
-        return LlmChatAnswer(answer="The documents describe this in passage 1.", passage_numbers=[1])
+        return LlmChatAnswer(answer="The documents describe this.", passages=["A"])
     raise AssertionError(f"unexpected schema {schema}")
 
 
