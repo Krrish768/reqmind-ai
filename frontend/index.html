@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReqMind</title>
+  <meta name="description" content="Turn a requirements document into a checked list, with conflicts, a graph and answers from the text.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f1c17'/%3E%3Crect x='7' y='13' width='18' height='7' rx='2' fill='%23d3efe4'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="wordmark" href="#projects">Req<span>mind</span></a>
+      <nav class="crumbs" id="crumbs" aria-label="Breadcrumb"></nav>
+      <div class="topbar-actions">
+        <a class="button quiet small" href="#about">How it works</a>
+        <span class="user-email" id="user-email"></span>
+        <button class="button small" id="logout" type="button" hidden>Log out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page" id="app" tabindex="-1"></main>
+  <div class="toast-area" id="toasts" aria-live="polite"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
