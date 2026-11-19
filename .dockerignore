@@ -4,8 +4,6 @@ venv/
 docs/
 tests/
 results/
-frontend/node_modules/
-frontend/.next/
 **/__pycache__/
 **/*.pyc
 .pytest_cache/
