@@ -1,0 +1,237 @@
+{
+  "totals": {
+    "labelled": 65,
+    "found": 66,
+    "correct": 65,
+    "extra": 1,
+    "missed": 0,
+    "type_correct": 51,
+    "vague_labelled": 5,
+    "vague_correct": 5,
+    "vague_extra": 2,
+    "vague_missed": 0,
+    "conflicts_labelled": 5,
+    "conflicts_correct": 5,
+    "conflicts_extra": 0,
+    "conflicts_missed": 0,
+    "lookalikes_reported": 0,
+    "lookalikes_total": 3,
+    "questions": 10,
+    "answers_checked": 3,
+    "answers_right": 3,
+    "seconds": 539.4,
+    "chat_seconds": 28.5,
+    "precision": 0.985,
+    "recall": 1.0,
+    "f1": 0.992,
+    "type_accuracy": 0.785,
+    "vague_precision": 0.714,
+    "vague_recall": 1.0,
+    "seconds_per_document": 107.9,
+    "seconds_per_question": 2.9
+  },
+  "documents": [
+    {
+      "document": "canteen",
+      "labelled": 18,
+      "found": 19,
+      "vague_labelled": 1,
+      "conflicts_labelled": 2,
+      "notes": [],
+      "correct": 18,
+      "extra": 1,
+      "missed": 0,
+      "type_correct": 12,
+      "extra_sentences": [
+        "Time slot: a 15 minute pickup window."
+      ],
+      "missed_sentences": [],
+      "vague_correct": 1,
+      "vague_extra": 1,
+      "vague_missed": 0,
+      "conflicts_correct": 2,
+      "conflicts_extra": 0,
+      "conflicts_missed": 0,
+      "lookalikes_reported": 0,
+      "lookalikes_total": 0,
+      "seconds": 129.4,
+      "chunks": 2,
+      "questions": 2,
+      "answers_checked": 1,
+      "answers_right": 1,
+      "answers": [
+        {
+          "question": "When does a student session expire?",
+          "answer": null,
+          "right": false
+        },
+        {
+          "question": "How do students pay for an order?",
+          "answer": "Students pay for an order through UPI using the payment gateway.",
+          "right": true
+        }
+      ],
+      "chat_seconds": 6.7
+    },
+    {
+      "document": "clinic",
+      "labelled": 12,
+      "found": 12,
+      "vague_labelled": 1,
+      "conflicts_labelled": 1,
+      "notes": [],
+      "correct": 12,
+      "extra": 0,
+      "missed": 0,
+      "type_correct": 11,
+      "extra_sentences": [],
+      "missed_sentences": [],
+      "vague_correct": 1,
+      "vague_extra": 0,
+      "vague_missed": 0,
+      "conflicts_correct": 1,
+      "conflicts_extra": 0,
+      "conflicts_missed": 0,
+      "lookalikes_reported": 0,
+      "lookalikes_total": 1,
+      "seconds": 58.8,
+      "chunks": 1,
+      "questions": 2,
+      "answers_checked": 0,
+      "answers_right": 0,
+      "answers": [
+        {
+          "question": "How long before the appointment is the SMS reminder sent?",
+          "answer": null,
+          "right": false
+        },
+        {
+          "question": "How long is one appointment slot?",
+          "answer": null,
+          "right": false
+        }
+      ],
+      "chat_seconds": 6.5
+    },
+    {
+      "document": "hostel",
+      "labelled": 12,
+      "found": 12,
+      "vague_labelled": 1,
+      "conflicts_labelled": 1,
+      "notes": [],
+      "correct": 12,
+      "extra": 0,
+      "missed": 0,
+      "type_correct": 10,
+      "extra_sentences": [],
+      "missed_sentences": [],
+      "vague_correct": 1,
+      "vague_extra": 0,
+      "vague_missed": 0,
+      "conflicts_correct": 1,
+      "conflicts_extra": 0,
+      "conflicts_missed": 0,
+      "lookalikes_reported": 0,
+      "lookalikes_total": 0,
+      "seconds": 127.1,
+      "chunks": 1,
+      "questions": 2,
+      "answers_checked": 1,
+      "answers_right": 1,
+      "answers": [
+        {
+          "question": "What is the size limit for photos?",
+          "answer": "The size limit for photos is 5 MB.",
+          "right": true
+        },
+        {
+          "question": "Can a student stay anonymous?",
+          "answer": null,
+          "right": false
+        }
+      ],
+      "chat_seconds": 3.3
+    },
+    {
+      "document": "library",
+      "labelled": 12,
+      "found": 12,
+      "vague_labelled": 1,
+      "conflicts_labelled": 0,
+      "notes": [],
+      "correct": 12,
+      "extra": 0,
+      "missed": 0,
+      "type_correct": 11,
+      "extra_sentences": [],
+      "missed_sentences": [],
+      "vague_correct": 1,
+      "vague_extra": 1,
+      "vague_missed": 0,
+      "conflicts_correct": 0,
+      "conflicts_extra": 0,
+      "conflicts_missed": 0,
+      "lookalikes_reported": 0,
+      "lookalikes_total": 2,
+      "seconds": 122.9,
+      "chunks": 1,
+      "questions": 2,
+      "answers_checked": 0,
+      "answers_right": 0,
+      "answers": [
+        {
+          "question": "How many books can a student reserve at the same time?",
+          "answer": null,
+          "right": false
+        },
+        {
+          "question": "How long is a reserved book held?",
+          "answer": null,
+          "right": false
+        }
+      ],
+      "chat_seconds": 8.7
+    },
+    {
+      "document": "returns",
+      "labelled": 11,
+      "found": 11,
+      "vague_labelled": 1,
+      "conflicts_labelled": 1,
+      "notes": [],
+      "correct": 11,
+      "extra": 0,
+      "missed": 0,
+      "type_correct": 7,
+      "extra_sentences": [],
+      "missed_sentences": [],
+      "vague_correct": 1,
+      "vague_extra": 0,
+      "vague_missed": 0,
+      "conflicts_correct": 1,
+      "conflicts_extra": 0,
+      "conflicts_missed": 0,
+      "lookalikes_reported": 0,
+      "lookalikes_total": 0,
+      "seconds": 101.2,
+      "chunks": 1,
+      "questions": 2,
+      "answers_checked": 1,
+      "answers_right": 1,
+      "answers": [
+        {
+          "question": "Within how many days does the refund reach the customer?",
+          "answer": null,
+          "right": false
+        },
+        {
+          "question": "Where is the refund sent?",
+          "answer": "The refund is sent to the original payment method.",
+          "right": true
+        }
+      ],
+      "chat_seconds": 3.3
+    }
+  ]
+}
