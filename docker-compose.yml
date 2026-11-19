@@ -1,6 +1,6 @@
 # Services for ReqMind AI.
 #
-#   docker compose up -d                              Postgres + MinIO (enough with configs/cpu_laptop.yaml)
+#   docker compose up -d                              Postgres + Silo (enough with configs/cpu_laptop.yaml)
 #   docker compose --profile ai up -d                 + Redis, Qdrant, Neo4j (configs/gpu_laptop.yaml)
 #   docker compose --profile app up -d --build        everything, with the API and the worker in containers
 #                                                     (configs/docker.yaml)
