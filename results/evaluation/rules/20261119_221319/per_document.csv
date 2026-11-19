@@ -1,0 +1,6 @@
+document,labelled,found,correct,extra,missed,type_correct,vague_labelled,vague_correct,vague_extra,vague_missed,conflicts_labelled,conflicts_correct,conflicts_extra,conflicts_missed,lookalikes_reported,lookalikes_total,seconds
+canteen,18,18,18,0,0,13,1,1,0,0,2,2,0,0,0,0,0.0
+clinic,12,11,10,1,2,6,1,1,0,0,1,0,1,1,1,1,0.0
+hostel,12,11,11,0,1,9,1,1,0,0,1,1,0,0,0,0,0.0
+library,12,12,12,0,0,9,1,1,0,0,0,0,2,0,2,2,0.0
+returns,11,10,9,1,2,5,1,1,0,0,1,1,0,0,0,0,0.0
