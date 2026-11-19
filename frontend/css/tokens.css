@@ -1,0 +1,67 @@
+/* Design tokens. Every colour, size and shadow of the app is defined here.
+   Each concept has one colour pair (soft background + ink) used everywhere it appears. */
+
+@font-face { font-family: "Fraunces"; src: url("../fonts/fraunces-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Fraunces"; src: url("../fonts/fraunces-latin-400-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: "Instrument Sans"; src: url("../fonts/instrument-sans-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Instrument Sans"; src: url("../fonts/instrument-sans-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Instrument Sans"; src: url("../fonts/instrument-sans-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "JetBrains Mono"; src: url("../fonts/jetbrains-mono-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "JetBrains Mono"; src: url("../fonts/jetbrains-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+
+:root {
+  /* paper and ink */
+  --paper: #f6f2ea;
+  --paper-deep: #ece5d8;
+  --surface: #fffdf8;
+  --surface-sunk: #f9f5ee;
+  --ink: #1f1c17;
+  --ink-soft: #4d473d;
+  --ink-faint: #6f675a;
+  --rule: #e2d9c9;
+  --rule-strong: #cfc3ad;
+
+  /* concepts: soft fill / ink */
+  --functional-bg: #d3efe4;      --functional: #0d6b51;
+  --nonfunctional-bg: #fbe6bd;   --nonfunctional: #8a5200;
+  --constraint-bg: #e9dcef;      --constraint: #6c3b78;
+  --conflict-bg: #fad6cf;        --conflict: #a8321c;
+  --entity-bg: #d8eaf5;          --entity: #1d5f86;
+  --document-bg: #ece2cf;        --document: #6a5534;
+  --vague: #e5b80b;
+  --ok-bg: #dcefd6;              --ok: #2f6b23;
+
+  /* the soft colour field behind each section; changed per page by JS */
+  --field-a: #eadfcb;
+  --field-b: #dcebe3;
+
+  /* type */
+  --font-display: "Fraunces", Georgia, serif;
+  --font-text: "Instrument Sans", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --size-xs: 0.78rem;
+  --size-s: 0.88rem;
+  --size-m: 1rem;
+  --size-l: 1.25rem;
+  --size-xl: 1.75rem;
+  --size-xxl: clamp(2rem, 4vw + 1rem, 3.4rem);
+
+  /* space, shape, depth */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2.25rem;
+  --space-7: 3.5rem;
+  --radius-s: 6px;
+  --radius-m: 10px;
+  --radius-l: 16px;
+  --shadow-1: 0 1px 2px rgba(60, 45, 20, 0.06), 0 1px 1px rgba(60, 45, 20, 0.04);
+  --shadow-2: 0 6px 18px rgba(60, 45, 20, 0.09), 0 2px 4px rgba(60, 45, 20, 0.05);
+  --shadow-3: 0 18px 40px rgba(60, 45, 20, 0.16);
+  --focus: 0 0 0 3px rgba(29, 95, 134, 0.35);
+  --page-width: 1180px;
+  --gutter: 16px;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
