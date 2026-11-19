@@ -1,0 +1,15 @@
+{
+  "method": "rules",
+  "date": "2026-11-19T22:29:52",
+  "git_commit": "54914ef",
+  "config": "gpu_laptop",
+  "llm_model": null,
+  "embed_model": null,
+  "seed": 42,
+  "num_ctx": 4096,
+  "conflict_similarity": 0.8,
+  "gpu": null,
+  "gpu_peak_mib": null,
+  "cpu_count": 16,
+  "python": "3.12.3"
+}
