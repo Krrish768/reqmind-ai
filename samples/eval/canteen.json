@@ -1,0 +1,180 @@
+{
+ "name": "canteen",
+ "title": "Campus Canteen Ordering System",
+ "lines": [
+  {
+   "text": "Campus Canteen Ordering System - Software Requirements",
+   "id": null
+  },
+  {
+   "text": "1. Introduction",
+   "id": null
+  },
+  {
+   "text": "Students now wait in long queues at the campus canteen during lunch breaks. This document describes a web app that lets them order and pay before they arrive.",
+   "id": null
+  },
+  {
+   "text": "2. Accounts",
+   "id": null
+  },
+  {
+   "text": "- Students shall sign up with their university email address.",
+   "id": "C1",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- The system shall lock an account after 5 failed login attempts.",
+   "id": "C2",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- A student session shall expire after 15 minutes of inactivity.",
+   "id": "C3",
+   "type": "non_functional",
+   "vague": false
+  },
+  {
+   "text": "- Passwords must be stored as salted hashes.",
+   "id": "C4",
+   "type": "non_functional",
+   "vague": false
+  },
+  {
+   "text": "3. Ordering",
+   "id": null
+  },
+  {
+   "text": "- Students shall browse the menu by category and see the price of each item.",
+   "id": "C5",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- The system shall let a student place an order for pickup at a chosen time slot.",
+   "id": "C6",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- A student may cancel an order within 10 minutes of placing it.",
+   "id": "C7",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- The canteen staff shall see new orders on a dashboard within 5 seconds.",
+   "id": "C8",
+   "type": "non_functional",
+   "vague": false
+  },
+  {
+   "text": "- The menu page should be user-friendly and load fast on mobile phones.",
+   "id": "C9",
+   "type": "non_functional",
+   "vague": true
+  },
+  {
+   "text": "4. Payments",
+   "id": null
+  },
+  {
+   "text": "- The system shall accept payments through UPI using the payment gateway.",
+   "id": "C10",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- Orders must not be sent to the kitchen until the payment is confirmed.",
+   "id": "C11",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- The system should email a receipt to the student after each payment.",
+   "id": "C12",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "5. Policies",
+   "id": null
+  },
+  {
+   "text": "- An order shall only be cancelled within 5 minutes of placing it, and no refund is given after that.",
+   "id": "C13",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- To keep the app secure, a student session shall expire after 30 minutes of inactivity.",
+   "id": "C14",
+   "type": "non_functional",
+   "vague": false
+  },
+  {
+   "text": "6. Quality",
+   "id": null
+  },
+  {
+   "text": "- The system shall support 300 students ordering at the same time.",
+   "id": "C15",
+   "type": "non_functional",
+   "vague": false
+  },
+  {
+   "text": "- The app shall be available 99.5% of the time during canteen hours.",
+   "id": "C16",
+   "type": "non_functional",
+   "vague": false
+  },
+  {
+   "text": "- The system must comply with the university data protection policy.",
+   "id": "C17",
+   "type": "constraint",
+   "vague": false
+  },
+  {
+   "text": "- The system will keep order history for one academic year for reports.",
+   "id": "C18",
+   "type": "non_functional",
+   "vague": false
+  },
+  {
+   "text": "7. Glossary",
+   "id": null
+  },
+  {
+   "text": "Time slot: a 15 minute pickup window.",
+   "id": null
+  }
+ ],
+ "conflicts": [
+  [
+   "C3",
+   "C14"
+  ],
+  [
+   "C7",
+   "C13"
+  ]
+ ],
+ "lookalikes": [],
+ "questions": [
+  {
+   "question": "When does a student session expire?",
+   "expect_any": [
+    "15",
+    "30"
+   ]
+  },
+  {
+   "question": "How do students pay for an order?",
+   "expect_any": [
+    "UPI"
+   ]
+  }
+ ]
+}
