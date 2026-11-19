@@ -1,0 +1,15 @@
+{
+  "method": "llm",
+  "date": "2026-11-19T22:39:15",
+  "git_commit": "54914ef",
+  "config": "gpu_laptop",
+  "llm_model": "qwen3:8b",
+  "embed_model": "nomic-embed-text",
+  "seed": 42,
+  "num_ctx": 4096,
+  "conflict_similarity": 0.8,
+  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "gpu_peak_mib": 5922,
+  "cpu_count": 16,
+  "python": "3.12.3"
+}
