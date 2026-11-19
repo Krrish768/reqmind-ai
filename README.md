@@ -15,17 +15,19 @@ Team: Krrish Singh (backend, AI) and Muskaan Singhla (documents, export, fronten
 4. [Quick start with Docker](#quick-start-with-docker)
 5. [Models](#models)
 6. [Using it](#using-it)
-7. [Configuration](#configuration)
-8. [Design document](#design-document)
-9. [Tech stack](#tech-stack)
-10. [Repository structure](#repository-structure)
-11. [Code reference](#code-reference)
-12. [Approaches compared](#approaches-compared)
-13. [Hardware and run times](#hardware-and-run-times)
-14. [Limitations](#limitations)
-15. [Troubleshooting](#troubleshooting)
-16. [Citations](#citations)
-17. [License](#license)
+7. [Evaluation data](#evaluation-data)
+8. [Reproducing the results](#reproducing-the-results)
+9. [Configuration](#configuration)
+10. [Design document](#design-document)
+11. [Tech stack](#tech-stack)
+12. [Repository structure](#repository-structure)
+13. [Code reference](#code-reference)
+14. [Approaches compared](#approaches-compared)
+15. [Hardware and run times](#hardware-and-run-times)
+16. [Limitations](#limitations)
+17. [Troubleshooting](#troubleshooting)
+18. [Citations](#citations)
+19. [License](#license)
 
 ## What it does
 
@@ -43,7 +45,7 @@ Team: Krrish Singh (backend, AI) and Muskaan Singhla (documents, export, fronten
 | Knowledge graph | Documents, requirements and entities with their links | Neo4j (falls back to Postgres) |
 | Chat | Answers questions using only the project's passages, and shows them | Qdrant + LLM (falls back to keyword search) |
 | Teams | Every company sees only its own projects | Postgres |
-| Upload | PDF, DOCX, TXT and MD files are stored, read page by page and cut into passages | Silo/MinIO |
+| Upload | PDF, DOCX, TXT and MD files are stored, read page by page and cut into passages | Silo (S3 file store) |
 | Edit | Add, edit, approve or delete requirements by hand | Postgres |
 | Export | The list with its conflicts as Word, PDF or Markdown | python-docx, ReportLab |
 
@@ -51,15 +53,66 @@ Team: Krrish Singh (backend, AI) and Muskaan Singhla (documents, export, fronten
 
 ## Results
 
-No measured numbers yet. They will come from a hand-labelled set of documents.
+Measured on our 5 hand-labelled documents in `samples/eval/` (65 requirements, 5 vague lines, 5 conflicts, 3 look-alike pairs, 10 chat questions; see [Evaluation data](#evaluation-data)). Machine: RTX 4060 Laptop GPU (8 GB), config `gpu_laptop`, seed 42.
+
+Source: `results/evaluation/summary.md`, built by `scripts/build_results_table.py` from the runs `results/evaluation/rules/20261119_222952` and `results/evaluation/llm/20261119_223915`. Every number below is copied from those files.
+
+### Main results
 
 | Task | Metric | Text rules | qwen3:8b |
 |---|---|---|---|
-| Extraction | Recall / precision of requirements | TBD | TBD |
-| Conflicts | Found / missed on planted conflicts | TBD | TBD |
-| Chat | Answers fully supported by the shown passages | TBD | TBD |
+| Extraction | Precision | 0.968 | 0.984 |
+| Extraction | Recall | 0.923 | 0.969 |
+| Extraction | F1 | 0.945 | 0.976 |
+| Extraction | Type right (on correct ones) | 0.700 | 0.794 |
+| Vague wording | Precision / recall | 1.000 / 1.000 | 0.714 / 1.000 |
+| Conflicts | Found / missed / false alarms | 4 / 1 / 3 | 4 / 1 / 0 |
+| Conflicts | Look-alike pairs reported as conflicts (of 3) | 3 | 0 |
+| Chat | Answers that passed the grounding check (of 10) | – | 10 |
+| Chat | Right answers (of 10) | – | 9 |
+| Time | Seconds per document | 0.0 | 110.0 |
+| Time | Seconds per chat question | – | 1.3 |
 
-On `samples/chunks.json` (4 chunks, 18 requirement sentences, 2 planted conflicts) the text rules find all 18 sentences and both conflicts. This file is used by the tests; it is too small to count as a result.
+Peak GPU memory during the LLM run: 5922 MiB. Chat needs the LLM, so it has no text-rules column.
+
+### Requirements per document
+
+From `per_document.csv` of the same runs. Correct / labelled.
+
+| Document | Labelled | Text rules | qwen3:8b | LLM seconds |
+|---|---|---|---|---|
+| canteen | 18 | 18 | 18 (+1 extra) | 127.6 |
+| clinic | 12 | 10 (+1 extra) | 11 | 103.4 |
+| hostel | 12 | 11 | 11 | 115.5 |
+| library | 12 | 12 | 12 | 136.2 |
+| returns | 11 | 9 (+1 extra) | 11 | 67.3 |
+
+### Repeat run of the LLM
+
+The LLM was run twice on the same files with the same seed. The extraction code did not change between the runs; only the chat prompt did (see [Approaches compared](#approaches-compared)).
+
+| Metric | LLM run 1 (`llm/20261119_222247`) | LLM run 2 (`llm/20261119_223915`) |
+|---|---|---|
+| Correct requirements (of 65) | 65 | 63 |
+| F1 | 0.992 | 0.976 |
+| Conflicts found (of 5) | 5 | 4 |
+| Chat answers that passed the check (of 10) | 3 | 10 |
+
+The table above reports run 2, the latest one. The text rules gave the same scores in both of their runs.
+
+### What went wrong
+
+| Method | Error | Example from the test set |
+|---|---|---|
+| Text rules | Misses lines with no modal verb | "Refunds are sent to the original payment method." |
+| Text rules | Takes a background line with "will" | "Most patients will use the app on their phones." |
+| Text rules | Reports look-alikes as conflicts | "at most 3 books" vs "up to 5 books ... during exam weeks" |
+| qwen3:8b | Skips a clear line in one run, finds it in the other | "A patient may cancel an appointment up to 6 hours before it starts." |
+| qwen3:8b | Takes a definition line | "Time slot: a 15 minute pickup window." |
+| qwen3:8b | Flags 2 clear lines as vague | – |
+| Chat | Right answer scored wrong: it said only "Yes" and the scorer looks for the word "anonymous" | "Can a student stay anonymous?" |
+
+The test set is small and written by us, so these numbers show how the methods compare. They are not a general accuracy claim.
 
 ## Quick start without Docker
 
@@ -97,8 +150,9 @@ Set `APP_CONFIG=gpu_laptop` if you have Ollama, or `APP_CONFIG=cpu_laptop` if no
 ### 3. Start the services
 
 ```bash
-docker compose --profile ai up -d   # gpu_laptop: Postgres, MinIO, Redis, Qdrant, Neo4j
-docker compose up -d                # cpu_laptop: only Postgres and MinIO
+docker compose --profile ai up -d   # gpu_laptop: Postgres, Silo (file store), Redis, Qdrant, Neo4j
+docker compose up -d                # cpu_laptop: only Postgres and Silo
+docker compose ps                   # every service should show "running" or "healthy"
 ```
 
 ### 4. Download the models (gpu_laptop only)
@@ -133,7 +187,7 @@ If Ollama is not running, the analysis still finishes with the text rules, and t
 python -m pytest -q
 ```
 
-The tests use SQLite, an in-memory Qdrant and a fake LLM, so no service needs to be running.
+The tests use SQLite, an in-memory Qdrant and a fake LLM, so no service needs to be running. Expected: `70 passed` in about 30 seconds.
 
 ## Quick start with Docker
 
@@ -165,11 +219,20 @@ docker compose --profile app down                   # stop (data stays)
 docker compose --profile app down -v                # stop and delete all data
 ```
 
-What stays on the host: the database, uploaded files, vectors and the graph live in Docker volumes (`postgres_data`, `minio_data`, `qdrant_data`, `neo4j_data`) and survive rebuilds. Models stay in Ollama's own folder on the host.
+What stays on the host: the database, uploaded files, vectors and the graph live in Docker volumes (`postgres_data`, `minio_data`, `qdrant_data`, `neo4j_data`) and survive rebuilds. The Silo file store keeps the old `minio` service and volume names. Models stay in Ollama's own folder on the host.
 
 Without a GPU: start Ollama on CPU (slow) or not at all; the analysis falls back to the text rules.
 
-Docker status: `docker compose config` and the image build were tested (image 1.1 GB). Running the app containers was not tested yet. <!-- TODO: test docker compose --profile app up on the laptop -->
+Docker status:
+
+| Check | Done |
+|---|---|
+| `docker compose config -q` (both profiles) | Yes |
+| `docker compose build backend` | Yes, image 1.1 GB |
+| Services only (`--profile ai`) with the API on the host | Yes, this is how all results were made |
+| Backend and worker inside containers (`--profile app`) | Not tested yet |
+
+To test the last row, run the commands in step 4, then upload a file on http://localhost:8000, press Analyze and check `docker compose logs -f worker` for the finished job.
 
 ## Models
 
@@ -206,6 +269,12 @@ Plain HTML, CSS and JavaScript in `frontend/`, served by the API at http://local
 
 Each concept has one colour everywhere: green functional, amber non-functional, plum constraint, coral conflict, blue entity, sand document, yellow wavy line for vague words.
 
+| Conflicts page | Graph page |
+|---|---|
+| ![Two conflicting pairs side by side, each with the reason](docs/images/conflicts_page.png) | ![Document, requirements and entities as a graph, with a dashed red line between two conflicting requirements](docs/images/graph_page.png) |
+
+*Both made with the sample canteen document and the text rules.*
+
 ### Command line
 
 ```bash
@@ -213,6 +282,7 @@ python -m scripts.analyze_document --chunks samples/chunks.json --limit 1   # ag
 python -m scripts.analyze_document --chunks samples/chunks.json --rules     # text rules only
 python -m scripts.analyze_document --document-id 3                          # full pipeline on a saved document
 python -m scripts.check_services                                            # are the services up?
+python -m scripts.evaluate --method rules                                   # score the text rules (see Reproducing the results)
 ```
 
 ### API
@@ -246,6 +316,57 @@ curl -X POST localhost:8000/api/auth/login -H "Content-Type: application/json" \
      -d '{"email": "you@example.com", "password": "secret123"}'
 ```
 
+The full API with request and response formats is at http://localhost:8000/docs while the API runs.
+
+## Evaluation data
+
+Five short requirement documents that we wrote and labelled by hand. They are in the repo, so nothing has to be downloaded.
+
+| File | Document | Lines | Requirements | Vague | Conflicts | Look-alikes | Questions |
+|---|---|---|---|---|---|---|---|
+| `samples/eval/canteen.json` | Campus Canteen Ordering System | 28 | 18 | 1 | 2 | 0 | 2 |
+| `samples/eval/library.json` | Library Book Booking App | 18 | 12 | 1 | 0 | 2 | 2 |
+| `samples/eval/clinic.json` | Clinic Appointment App | 19 | 12 | 1 | 1 | 1 | 2 |
+| `samples/eval/returns.json` | ShopEasy Returns Module | 17 | 11 | 1 | 1 | 0 | 2 |
+| `samples/eval/hostel.json` | Hostel Complaint Portal | 17 | 12 | 1 | 1 | 0 | 2 |
+| **Total** | | **99** | **65** | **5** | **5** | **3** | **10** |
+
+The 34 lines that are not requirements are headings and background sentences. They check that a method does not pick up extra lines. A look-alike pair has different numbers but is not a conflict, for example a general limit and a separate limit for exam weeks.
+
+File format (one JSON file per document):
+
+| Field | Meaning |
+|---|---|
+| `name`, `title` | Short name and document title |
+| `lines[]` | Every line in order: `text`, and for a requirement also `id`, `type` (`functional`, `non_functional`, `constraint`) and `vague` (true/false). Lines with `id: null` are not requirements |
+| `conflicts[]` | Pairs of line ids that cannot both be true |
+| `lookalikes[]` | Pairs of line ids that look like a conflict but are not |
+| `questions[]` | A chat `question` and `expect_any`: the answer is right if it holds one of these words |
+
+How a found requirement is matched to a label: its quote holds the labelled line, or they share at least 60% of their words. The best pairs are matched first and each label is used once.
+
+## Reproducing the results
+
+Run from the repo root with the venv active. The LLM run needs Ollama with both models (`gpu_laptop` config); the rules run needs nothing.
+
+| Order | Command | Reads | Writes | Time |
+|---|---|---|---|---|
+| 1 | `python -m scripts.evaluate --method rules` | `samples/eval/*.json` | `results/evaluation/rules/<date_time>/` | a few seconds |
+| 2 | `python -m scripts.evaluate --method llm` | `samples/eval/*.json`, Ollama | `results/evaluation/llm/<date_time>/` | about 10 min |
+| 3 | `python -m scripts.build_results_table` | newest run of each method | `results/evaluation/summary.md` (and prints it) | a few seconds |
+
+`--method both` runs steps 1 and 2 together. `--limit 1` runs only the first document, for a quick test.
+
+Each run folder holds:
+
+| File | Content |
+|---|---|
+| `metrics.json` | Totals, per-document counts, the missed and extra sentences, every chat answer |
+| `per_document.csv` | One row per document |
+| `run_info.json` | Date, git commit, config, models, seed, context size, GPU and its peak memory |
+
+The LLM gives slightly different results between runs even with seed 42 (see [Repeat run of the LLM](#repeat-run-of-the-llm)). The text rules always give the same result.
+
 ## Configuration
 
 | File | Used on |
@@ -264,6 +385,9 @@ curl -X POST localhost:8000/api/auth/login -H "Content-Type: application/json" \
 | `analysis.conflict_similarity` | Pairs with cosine similarity at or above this are checked for conflicts |
 | `analysis.max_conflict_pairs` | Upper limit of LLM conflict checks per document |
 | `chat.top_k` | Passages given to the LLM per question |
+| `ingestion.chunk_chars`, `ingestion.overlap_chars` | Chunk size (1200) and how much two chunks share (150) |
+| `ingestion.max_upload_mb` | Largest file that can be uploaded |
+| `seed` | Seed for the LLM calls |
 
 ## Design document
 
@@ -299,9 +423,10 @@ See [What it does](#what-it-does). At the boundary: a document without chunks ca
 
 | Non-functional | Target | Measured |
 |---|---|---|
-| Analysis time, 10-page document, RTX 4060 | under 5 min | TBD |
-| Chat answer time | under 10 s | TBD |
-| VRAM | under 8 GB | TBD |
+| Analysis time per document, RTX 4060 | under 5 min | 110 s on average for the test documents (1–2 chunks each). A 10-page document was not timed |
+| Chat answer time | under 10 s | 1.3 s per question |
+| VRAM | under 8 GB | 5922 MiB peak, both models loaded |
+| Reproducibility | Same numbers on a re-run | Text rules: yes. LLM: close, not equal (F1 0.992 and 0.976) |
 | Cost | 0 (local models, free tools) | 0 |
 | Privacy | documents never leave the machine | yes, no cloud calls |
 
@@ -320,9 +445,9 @@ flowchart LR
     W --> NJ[(Neo4j)]
     API -->|chat search| QD
     API -->|graph| NJ
-    API --> MI[(MinIO files)]
+    API --> SI[(Silo file store)]
 ```
-<!-- TODO: export this diagram to docs/images/architecture.png for slides -->
+The same diagram as an image: `docs/images/architecture.png`.
 
 | Component | Why it exists |
 |---|---|
@@ -333,7 +458,7 @@ flowchart LR
 | Ollama | Local LLM and embeddings, no cost, private |
 | Qdrant | Vector search for chat (F7) |
 | Neo4j | Graph queries over requirements and entities |
-| Silo (MinIO fork) | Stores the original uploaded files |
+| Silo (S3 file store) | Stores the original uploaded files |
 
 How a request moves: the page asks the API to analyze a parsed document. The API saves a job and puts it on the Redis queue. The worker reads the chunks from Postgres and runs the LangGraph workflow. Each chunk goes to the LLM; every answer is checked against the chunk and retried once if needed. Requirements are embedded, similar pairs and number clashes are judged, and conflicts are kept only with a grounded reason. Results are saved to Postgres, chunk vectors go to Qdrant and the graph is copied to Neo4j. The page polls the job until it is done.
 
@@ -349,14 +474,29 @@ How a request moves: the page asks the API to analyze a parsed document. The API
 | A user joins another company by typing its name | Not handled yet | See Limitations |
 
 ### 7. Evaluation plan
-Hand-label 5–10 public SRS documents (requirements and planted conflicts). Compare text rules against the LLM on recall and precision of requirements, and found/missed conflicts. Check chat answers by hand for support by the shown passages. Report per document, plus analysis time and VRAM. <!-- TODO: build scripts/evaluate_extraction.py and fill the Results table -->
+What was done: 5 short documents written and labelled by us (see [Evaluation data](#evaluation-data)), scored by `scripts/evaluate.py` for both methods. Results are in [Results](#results).
+
+| Stage | Metric | Target | Measured (qwen3:8b) |
+|---|---|---|---|
+| Extraction | Recall | at least 0.90 | 0.969 |
+| Extraction | Precision | at least 0.90 | 0.984 |
+| Vague wording | Recall | 1.0 (the word list must never miss) | 1.000 |
+| Conflicts | False alarms | 0 | 0 |
+| Conflicts | Found | at least 4 of 5 | 4 |
+| Chat | Answers that pass the grounding check | at least 9 of 10 | 10 |
+
+Slices: per document (table in Results), and look-alike pairs on their own. Human review: every missed and extra sentence in `metrics.json` was read by hand; the table "What went wrong" in Results comes from that review.
+
+Not done yet: real SRS documents from outside the team, longer documents (10+ pages), and a second person labelling the same files.
 
 ### 8. Open questions and risks
 
 | Question or risk | How to find out or handle it |
 |---|---|
-| Is qwen3:8b good enough on long, messy documents? | Evaluation above; try a smaller and a larger model |
-| Is 0.80 the right similarity threshold for nomic-embed-text? | Tune on the labelled conflicts |
+| Is qwen3:8b good enough on long, messy, real documents? | Label 5–10 real SRS documents and run `scripts/evaluate.py` again; try a smaller and a larger model |
+| Is 0.80 the right similarity threshold for nomic-embed-text? | On the test set it gave no false conflicts and missed 1 of 5; tune it on a bigger set |
+| The LLM gives slightly different results between runs | Report more than one run; check how far the scores move |
+| The chat scorer looks for a keyword, so a short right answer can count as wrong | Check chat answers by hand, or ask for a full-sentence answer |
 | Company signup is open to anyone who knows the name | Add invites before any real use |
 
 ## Tech stack
@@ -379,12 +519,18 @@ Hand-label 5–10 public SRS documents (requirements and planted conflicts). Com
 ```
 reqmind-ai/
 ├── README.md
+├── LICENSE                   MIT
 ├── requirements.txt          pinned packages, one section per teammate
 ├── Dockerfile                image for the API and the worker
-├── docker-compose.yml        Postgres, MinIO, Redis, Qdrant, Neo4j, API, worker
+├── docker-compose.yml        Postgres, Silo, Redis, Qdrant, Neo4j, API, worker
+├── .dockerignore             keeps the venv, git and .env out of the image
 ├── .env.example              secrets and APP_CONFIG
 ├── configs/                  settings per machine, models list
-├── samples/chunks.json       small example document in the chunk format
+├── samples/
+│   ├── chunks.json           small example document in the chunk format (used by the tests)
+│   └── eval/                 the 5 labelled test documents
+├── results/evaluation/       saved evaluation runs and summary.md
+├── docs/images/              screenshots and the architecture diagram
 ├── backend/app/
 │   ├── main.py               creates the app, mounts the web page
 │   ├── config.py             loads configs/<APP_CONFIG>.yaml and .env
@@ -400,8 +546,9 @@ reqmind-ai/
 │   ├── rag/                  Qdrant store and chat answers
 │   ├── ingestion/            file storage, parsing (PDF/DOCX/TXT/MD), chunking, upload
 │   ├── export/               Markdown, Word and PDF export
-│   └── knowledge_graph/      graph from Postgres and Neo4j copy
-├── scripts/                  worker, model download, service check, CLI analysis
+│   ├── knowledge_graph/      graph from Postgres and Neo4j copy
+│   └── evaluation/           test set loader, scoring, evaluation runs
+├── scripts/                  worker, model download, service check, CLI analysis, evaluation
 ├── tests/                    pytest tests
 └── frontend/
     ├── index.html            the single page
@@ -462,12 +609,32 @@ reqmind-ai/
 | `api.deps.next_requirement_code` | Next free REQ-NNN in a project |
 </details>
 
+<details><summary><code>backend/app/evaluation/</code> and the evaluation scripts</summary>
+
+| Function | What it does |
+|---|---|
+| `dataset.load_documents` | Reads every labelled file in `samples/eval/` |
+| `scoring.match_requirements` | Pairs found requirements with labels (containment or 60% word overlap, best pairs first) |
+| `scoring.extraction_counts` / `vague_counts` / `conflict_counts` | Correct, extra and missed per task |
+| `runner.make_chunks` | Cuts a test document the same way as an upload |
+| `runner.evaluate_document` | Analyzes one document, scores it and, with the LLM, asks its questions |
+| `runner.totals` | Sums over documents and works out precision, recall and F1 |
+| `runner.GpuMonitor` | Reads GPU memory twice a second and keeps the peak |
+| `runner.save_run` | Writes `metrics.json`, `per_document.csv` and `run_info.json` |
+| `scripts/evaluate.run_method` | One method on all documents, then saves the run |
+| `scripts/build_results_table.build` | Tables from the newest run of each method |
+</details>
+
 ## Approaches compared
 
 | Task | Tested | In use | Deciding metric | Result |
 |---|---|---|---|---|
-| Extraction | Text rules, qwen3:8b | qwen3:8b with rules as fallback | Recall at equal precision | TBD |
-| Conflicts | Number rules, embeddings + qwen3:8b | Both together | Found / missed planted conflicts | TBD |
+| Extraction | Text rules, qwen3:8b | qwen3:8b with rules as fallback | Recall at equal precision | Recall 0.969 vs 0.923, precision 0.984 vs 0.968 |
+| Vague wording | Word list, word list + LLM "unclear" flag | Both (the list always runs) | Recall | Both 1.0; the LLM adds 2 false flags |
+| Conflicts | Number rules, embeddings + qwen3:8b | Both together | False alarms at equal found | 0 vs 3 false alarms, both found 4 of 5 |
+| Chat passage labels | Numbers 1–5, letters A–E | Letters | Answers that pass the grounding check | 3 of 10 with numbers, 10 of 10 with letters |
+
+Why letters: the test documents have numbered sections, and with numbered passages the model often cited a section number in place of a passage number, so the check threw the answer out. Run 1 used numbers, run 2 letters (see [Repeat run of the LLM](#repeat-run-of-the-llm)).
 
 ## Hardware and run times
 
@@ -475,7 +642,15 @@ reqmind-ai/
 |---|---|
 | HP Victus, RTX 4060 8 GB, 16 GB RAM, Ubuntu 24.04 | Development and AI runs |
 
-Analysis and chat times: TBD. Minimum: any machine with Docker for `cpu_laptop`; an 8 GB NVIDIA GPU for `gpu_laptop`.
+| Step | Text rules | qwen3:8b on the RTX 4060 |
+|---|---|---|
+| Analysis of one test document (1–2 chunks) | under 0.1 s | 67–136 s, 110 s on average |
+| Chat question | – | 1.3 s on average |
+| Full evaluation (5 documents + 10 questions) | a few seconds | about 10 min |
+| Test suite (`pytest`) | about 30 s, no GPU | – |
+| Peak GPU memory | – | 5922 MiB of 8 GB |
+
+Source: `run_info.json` and `metrics.json` of the runs named in [Results](#results). Minimum: any machine with Docker for `cpu_laptop`; an 8 GB NVIDIA GPU for `gpu_laptop`.
 
 ## Limitations
 - Only the first 40 chunks of a document are analyzed (`analysis.max_chunks`).
@@ -484,6 +659,11 @@ Analysis and chat times: TBD. Minimum: any machine with Docker for `cpu_laptop`;
 - Uploads above 10 MB are refused (`ingestion.max_upload_mb`).
 - Anyone who types an existing company name at signup joins that company.
 - Database tables are created on start; there are no migrations, so a changed column needs a reset (`docker compose down -v`).
+- Chat has no memory: every question is answered on its own, and it only searches document passages, not the analysis results (counts, conflicts).
+- The LLM gives slightly different results between runs, even with a fixed seed.
+- The test set is small (5 documents, 65 requirements) and written by us, so the scores are a comparison, not a general accuracy claim.
+- An LLM analysis takes about 2 minutes for a one-page document; long documents take much longer.
+- There is no filter on the Requirements page to show only vague lines yet.
 
 ## Troubleshooting
 
@@ -499,6 +679,10 @@ Analysis and chat times: TBD. Minimum: any machine with Docker for `cpu_laptop`;
 | `pull access denied for minio/minio` | The official image is gone; `docker-compose.yml` uses `pgsty/silo`. Run `git pull` |
 | Port already in use | `docker compose down`, or stop the other program on that port |
 | Graph `source` is `database` | Neo4j is off or down; `docker compose --profile ai up -d neo4j` |
+| Neo4j shows as down right after start | It needs about 30 s to start; wait and run `python -m scripts.check_services` again |
+| Worker: `Error connecting to Redis` / connection refused on 6379 | Redis runs only with the ai profile: `docker compose --profile ai up -d` |
+| `column ... company_id does not exist` | The database was made by an older version; reset it with `docker compose down -v` and start again (this deletes the data) |
+| `Ollama is not ready` from `scripts.evaluate` | Start Ollama and pull both models, or run `--method rules` only |
 
 ## Citations
 - Qwen Team. *Qwen3 Technical Report*, 2025. https://arxiv.org/abs/2505.09388
