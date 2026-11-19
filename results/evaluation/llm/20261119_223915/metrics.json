@@ -1,0 +1,241 @@
+{
+  "totals": {
+    "labelled": 65,
+    "found": 64,
+    "correct": 63,
+    "extra": 1,
+    "missed": 2,
+    "type_correct": 50,
+    "vague_labelled": 5,
+    "vague_correct": 5,
+    "vague_extra": 2,
+    "vague_missed": 0,
+    "conflicts_labelled": 5,
+    "conflicts_correct": 4,
+    "conflicts_extra": 0,
+    "conflicts_missed": 1,
+    "lookalikes_reported": 0,
+    "lookalikes_total": 3,
+    "questions": 10,
+    "answers_checked": 10,
+    "answers_right": 9,
+    "seconds": 550.0,
+    "chat_seconds": 13.3,
+    "precision": 0.984,
+    "recall": 0.969,
+    "f1": 0.976,
+    "type_accuracy": 0.794,
+    "vague_precision": 0.714,
+    "vague_recall": 1.0,
+    "seconds_per_document": 110.0,
+    "seconds_per_question": 1.3
+  },
+  "documents": [
+    {
+      "document": "canteen",
+      "labelled": 18,
+      "found": 19,
+      "vague_labelled": 1,
+      "conflicts_labelled": 2,
+      "notes": [],
+      "correct": 18,
+      "extra": 1,
+      "missed": 0,
+      "type_correct": 12,
+      "extra_sentences": [
+        "Time slot: a 15 minute pickup window."
+      ],
+      "missed_sentences": [],
+      "vague_correct": 1,
+      "vague_extra": 1,
+      "vague_missed": 0,
+      "conflicts_correct": 2,
+      "conflicts_extra": 0,
+      "conflicts_missed": 0,
+      "lookalikes_reported": 0,
+      "lookalikes_total": 0,
+      "seconds": 127.6,
+      "chunks": 2,
+      "questions": 2,
+      "answers_checked": 2,
+      "answers_right": 2,
+      "answers": [
+        {
+          "question": "When does a student session expire?",
+          "answer": "A student session expires after 15 minutes of inactivity.",
+          "right": true
+        },
+        {
+          "question": "How do students pay for an order?",
+          "answer": "Students pay for an order through UPI using the payment gateway.",
+          "right": true
+        }
+      ],
+      "chat_seconds": 3.0
+    },
+    {
+      "document": "clinic",
+      "labelled": 12,
+      "found": 11,
+      "vague_labelled": 1,
+      "conflicts_labelled": 1,
+      "notes": [],
+      "correct": 11,
+      "extra": 0,
+      "missed": 1,
+      "type_correct": 10,
+      "extra_sentences": [],
+      "missed_sentences": [
+        "- A patient may cancel an appointment up to 6 hours before it starts."
+      ],
+      "vague_correct": 1,
+      "vague_extra": 0,
+      "vague_missed": 0,
+      "conflicts_correct": 0,
+      "conflicts_extra": 0,
+      "conflicts_missed": 1,
+      "lookalikes_reported": 0,
+      "lookalikes_total": 1,
+      "seconds": 103.4,
+      "chunks": 1,
+      "questions": 2,
+      "answers_checked": 2,
+      "answers_right": 2,
+      "answers": [
+        {
+          "question": "How long before the appointment is the SMS reminder sent?",
+          "answer": "24 hours",
+          "right": true
+        },
+        {
+          "question": "How long is one appointment slot?",
+          "answer": "15 minutes",
+          "right": true
+        }
+      ],
+      "chat_seconds": 1.9
+    },
+    {
+      "document": "hostel",
+      "labelled": 12,
+      "found": 11,
+      "vague_labelled": 1,
+      "conflicts_labelled": 1,
+      "notes": [],
+      "correct": 11,
+      "extra": 0,
+      "missed": 1,
+      "type_correct": 9,
+      "extra_sentences": [],
+      "missed_sentences": [
+        "- Students shall raise a complaint with a category, a description and an optional photo."
+      ],
+      "vague_correct": 1,
+      "vague_extra": 0,
+      "vague_missed": 0,
+      "conflicts_correct": 1,
+      "conflicts_extra": 0,
+      "conflicts_missed": 0,
+      "lookalikes_reported": 0,
+      "lookalikes_total": 0,
+      "seconds": 115.5,
+      "chunks": 1,
+      "questions": 2,
+      "answers_checked": 2,
+      "answers_right": 1,
+      "answers": [
+        {
+          "question": "What is the size limit for photos?",
+          "answer": "Photos larger than 5 MB are rejected.",
+          "right": true
+        },
+        {
+          "question": "Can a student stay anonymous?",
+          "answer": "Yes",
+          "right": false
+        }
+      ],
+      "chat_seconds": 1.9
+    },
+    {
+      "document": "library",
+      "labelled": 12,
+      "found": 12,
+      "vague_labelled": 1,
+      "conflicts_labelled": 0,
+      "notes": [],
+      "correct": 12,
+      "extra": 0,
+      "missed": 0,
+      "type_correct": 11,
+      "extra_sentences": [],
+      "missed_sentences": [],
+      "vague_correct": 1,
+      "vague_extra": 1,
+      "vague_missed": 0,
+      "conflicts_correct": 0,
+      "conflicts_extra": 0,
+      "conflicts_missed": 0,
+      "lookalikes_reported": 0,
+      "lookalikes_total": 2,
+      "seconds": 136.2,
+      "chunks": 1,
+      "questions": 2,
+      "answers_checked": 2,
+      "answers_right": 2,
+      "answers": [
+        {
+          "question": "How many books can a student reserve at the same time?",
+          "answer": "A student can reserve up to 3 books at the same time, except during exam weeks when they may reserve up to 5 books.",
+          "right": true
+        },
+        {
+          "question": "How long is a reserved book held?",
+          "answer": "A reserved book is held for 24 hours. If the student is a final-year student, the book is held for 48 hours.",
+          "right": true
+        }
+      ],
+      "chat_seconds": 4.4
+    },
+    {
+      "document": "returns",
+      "labelled": 11,
+      "found": 11,
+      "vague_labelled": 1,
+      "conflicts_labelled": 1,
+      "notes": [],
+      "correct": 11,
+      "extra": 0,
+      "missed": 0,
+      "type_correct": 8,
+      "extra_sentences": [],
+      "missed_sentences": [],
+      "vague_correct": 1,
+      "vague_extra": 0,
+      "vague_missed": 0,
+      "conflicts_correct": 1,
+      "conflicts_extra": 0,
+      "conflicts_missed": 0,
+      "lookalikes_reported": 0,
+      "lookalikes_total": 0,
+      "seconds": 67.3,
+      "chunks": 1,
+      "questions": 2,
+      "answers_checked": 2,
+      "answers_right": 2,
+      "answers": [
+        {
+          "question": "Within how many days does the refund reach the customer?",
+          "answer": "7 working days",
+          "right": true
+        },
+        {
+          "question": "Where is the refund sent?",
+          "answer": "The refund is sent to the original payment method.",
+          "right": true
+        }
+      ],
+      "chat_seconds": 2.1
+    }
+  ]
+}
