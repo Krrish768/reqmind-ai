@@ -4,7 +4,9 @@ Upload a software requirements document and get back a clean list of requirement
 
 Team: Krrish Singh (backend, AI) and Muskaan Singhla (documents, export, frontend). B.Tech AI, Bennett University. 2026.
 
-<!-- TODO: screenshot of the main screen once the frontend is in -->
+![Requirements page with counts per type, filters and the requirement table](docs/images/requirements_page.png)
+
+*Screenshot made with the sample document and the text rules (AI off).*
 
 ## Contents
 1. [What it does](#what-it-does)
@@ -41,7 +43,9 @@ Team: Krrish Singh (backend, AI) and Muskaan Singhla (documents, export, fronten
 | Knowledge graph | Documents, requirements and entities with their links | Neo4j (falls back to Postgres) |
 | Chat | Answers questions using only the project's passages, and shows them | Qdrant + LLM (falls back to keyword search) |
 | Teams | Every company sees only its own projects | Postgres |
-| Upload, edit, export | PDF/DOCX/TXT upload, manual edits, MD/PDF/DOCX export | Muskaan's part, not built yet |
+| Upload | PDF, DOCX, TXT and MD files are stored, read page by page and cut into passages | Silo/MinIO |
+| Edit | Add, edit, approve or delete requirements by hand | Postgres |
+| Export | The list with its conflicts as Word, PDF or Markdown | python-docx, ReportLab |
 
 **Scope.** In: English text documents, one company per account, local models only. Out: scanned documents (no OCR), other languages, tracing requirements to code.
 
@@ -119,7 +123,7 @@ uvicorn backend.app.main:app --reload --port 8000   # terminal 1: API
 python -m scripts.run_worker                         # terminal 2: worker (gpu_laptop only)
 ```
 
-API docs: http://localhost:8000/docs. The web page is served at http://localhost:8000 once `frontend/index.html` exists.
+Open http://localhost:8000 for the web page. API docs: http://localhost:8000/docs.
 
 If Ollama is not running, the analysis still finishes with the text rules, and the job message says so. If Neo4j is down, the graph is built from Postgres. If Qdrant is down, chat uses keyword search.
 
@@ -165,7 +169,7 @@ What stays on the host: the database, uploaded files, vectors and the graph live
 
 Without a GPU: start Ollama on CPU (slow) or not at all; the analysis falls back to the text rules.
 
-Docker status: `docker compose config` was checked. The image build and run were not tested yet. <!-- TODO: test build + run on the laptop -->
+Docker status: `docker compose config` and the image build were tested (image 1.1 GB). Running the app containers was not tested yet. <!-- TODO: test docker compose --profile app up on the laptop -->
 
 ## Models
 
@@ -187,7 +191,20 @@ To copy models from another machine, copy `~/.ollama/models` (or `/usr/share/oll
 ## Using it
 
 ### Web page
-<!-- TODO: list the pages when Muskaan's frontend is in -->
+Plain HTML, CSS and JavaScript in `frontend/`, served by the API at http://localhost:8000. Pages use hash routes, so refresh and the back button work.
+
+| Page | What you can do |
+|---|---|
+| `#signup`, `#login` | Create an account inside a team, or log in |
+| `#projects` | List and create projects |
+| `#project/<id>/documents` | Upload files (drag and drop), start an analysis and watch each step, download or delete a file |
+| `#project/<id>/requirements` | Counts per type, filters, the table; click a row to read its source passage, edit, approve or delete it; add one by hand |
+| `#project/<id>/conflicts` | Each conflicting pair side by side with the reason |
+| `#project/<id>/graph` | Documents, requirements and entities as a graph you can drag |
+| `#project/<id>/chat` | Ask questions; answers show the passages they come from |
+| `#about` | How the analysis works and which models it uses |
+
+Each concept has one colour everywhere: green functional, amber non-functional, plum constraint, coral conflict, blue entity, sand document, yellow wavy line for vague words.
 
 ### Command line
 
@@ -216,9 +233,13 @@ All routes start with `/api`. Every route except signup, login and health needs 
 | GET | `/api/projects/{id}/conflicts` | Conflicting pairs |
 | GET | `/api/projects/{id}/graph?refresh=true` | Graph nodes and edges |
 | POST | `/api/projects/{id}/chat` | Answer a question with sources |
-| | `/api/projects/{id}/documents ...` | Upload and list documents (Muskaan, not built yet) |
-| | `/api/projects/{id}/requirements ...` | List and edit requirements (Muskaan, not built yet) |
-| | `/api/projects/{id}/export ...` | Export (Muskaan, not built yet) |
+| POST / GET | `/api/projects/{id}/documents` | Upload a file (multipart field `file`) / list documents |
+| GET / DELETE | `/api/projects/{id}/documents/{doc_id}` | One document / delete it (its requirements stay) |
+| GET | `/api/projects/{id}/documents/{doc_id}/chunks` | Text passages of a document |
+| GET | `/api/projects/{id}/documents/{doc_id}/file` | Download the original file |
+| GET / POST | `/api/projects/{id}/requirements` | List (filters `type`, `status`, `document_id`) / add by hand |
+| PATCH / DELETE | `/api/projects/{id}/requirements/{req_id}` | Edit some fields / delete with its conflicts |
+| GET | `/api/projects/{id}/export?format=docx` | Download as `docx`, `pdf` or `md` |
 
 ```bash
 curl -X POST localhost:8000/api/auth/login -H "Content-Type: application/json" \
@@ -312,7 +333,7 @@ flowchart LR
 | Ollama | Local LLM and embeddings, no cost, private |
 | Qdrant | Vector search for chat (F7) |
 | Neo4j | Graph queries over requirements and entities |
-| MinIO | Stores uploaded files (Muskaan) |
+| Silo (MinIO fork) | Stores the original uploaded files |
 
 How a request moves: the page asks the API to analyze a parsed document. The API saves a job and puts it on the Redis queue. The worker reads the chunks from Postgres and runs the LangGraph workflow. Each chunk goes to the LLM; every answer is checked against the chunk and retried once if needed. Requirements are embedded, similar pairs and number clashes are judged, and conflicts are kept only with a grounded reason. Results are saved to Postgres, chunk vectors go to Qdrant and the graph is copied to Neo4j. The page polls the job until it is done.
 
@@ -342,7 +363,7 @@ Hand-label 5–10 public SRS documents (requirements and planted conflicts). Com
 
 | Layer | Tools |
 |---|---|
-| Language | Python 3.12, HTML/CSS/JS |
+| Language | Python 3.12, HTML/CSS/JS (no frontend framework: the pages are small and need fine control) |
 | Backend | FastAPI, SQLAlchemy, Pydantic, python-jose, passlib |
 | LLM | Ollama with qwen3:8b and nomic-embed-text |
 | Agents | LangGraph (a 4-node workflow, no tool-calling agents) |
@@ -377,10 +398,16 @@ reqmind-ai/
 │   ├── agents/               LangGraph workflow, LLM extraction, conflicts, text rules
 │   ├── llm/                  Ollama client, prompts, grounding checks
 │   ├── rag/                  Qdrant store and chat answers
+│   ├── ingestion/            file storage, parsing (PDF/DOCX/TXT/MD), chunking, upload
+│   ├── export/               Markdown, Word and PDF export
 │   └── knowledge_graph/      graph from Postgres and Neo4j copy
 ├── scripts/                  worker, model download, service check, CLI analysis
 ├── tests/                    pytest tests
-└── frontend/                 web page (being rebuilt in plain HTML/CSS/JS by Muskaan)
+└── frontend/
+    ├── index.html            the single page
+    ├── css/                  tokens (colours, type, spacing), layout, components, pages
+    ├── js/                   app.js (router), api.js, one file per page or tab
+    └── fonts/                Fraunces, Instrument Sans, JetBrains Mono (OFL)
 ```
 
 ## Code reference
@@ -413,6 +440,18 @@ reqmind-ai/
 | `neo4j_store.sync_project` / `read_project` | Neo4j copy of the graph |
 </details>
 
+<details><summary><code>backend/app/ingestion/</code>, <code>export/</code></summary>
+
+| Function | What it does |
+|---|---|
+| `upload.ingest_upload` | Check, store, parse and chunk one file; status parsed or failed |
+| `upload.remove_document` | Delete a document, its chunks, file and vectors; keep its requirements |
+| `parsing.parse_file` | Text per page; clear error for unknown, broken or scanned files |
+| `chunking.chunk_pages` | Passages of about `chunk_chars`, cut at line or sentence ends, with overlap |
+| `storage.save_file` / `read_file` / `delete_file` | The S3 store |
+| `builders.to_markdown` / `to_docx` / `to_pdf` | The export files |
+</details>
+
 <details><summary><code>backend/app/</code> top level</summary>
 
 | Function | What it does |
@@ -441,10 +480,10 @@ Analysis and chat times: TBD. Minimum: any machine with Docker for `cpu_laptop`;
 ## Limitations
 - Only the first 40 chunks of a document are analyzed (`analysis.max_chunks`).
 - The text rules only find sentences with modal verbs (shall, must, should, will, may, could, needs to).
-- No OCR: scanned PDFs give no text.
+- No OCR: scanned PDFs are saved with status failed and the reason.
+- Uploads above 10 MB are refused (`ingestion.max_upload_mb`).
 - Anyone who types an existing company name at signup joins that company.
 - Database tables are created on start; there are no migrations, so a changed column needs a reset (`docker compose down -v`).
-- The old Next.js pages call the old API paths and will be replaced.
 
 ## Troubleshooting
 
