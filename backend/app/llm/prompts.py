@@ -26,14 +26,20 @@ CONFLICT_RETRY = """Your last reason had these problems:
 Write the reason again using only numbers and facts from the two requirements."""
 
 CHAT_SYSTEM = """You answer questions about a project's requirement documents.
-Use only the numbered passages. If they do not answer the question, say that the documents do not say.
-List the numbers of the passages you used. Keep the answer short and plain."""
+Use only the passages. Each passage starts with a label like [Passage A].
+If they do not answer the question, say that the documents do not say.
+In "passages", list the letters of the passages you used, like ["A"]. Section numbers inside the text are not
+passage labels. Keep the answer short and plain, and do not mention passage labels in the answer."""
 
 CHAT_RETRY = """Your last answer had these problems:
 {errors}
-Answer again using only the numbered passages."""
+Answer again using only the passages, and list their letters (A, B, ...)."""
 
 
-def numbered_passages(texts: list[str]) -> str:
-    """Format passages as "[1] text" lines for the chat prompt."""
-    return "\n\n".join(f"[{number}] {text}" for number, text in enumerate(texts, start=1))
+# Letters, not numbers: documents have numbered sections, and the model mixed them up with passage numbers.
+PASSAGE_LETTERS = "ABCDEFGHIJ"
+
+
+def labelled_passages(texts: list[str]) -> str:
+    """Format passages as "[Passage A] text" blocks for the chat prompt."""
+    return "\n\n".join(f"[Passage {letter}] {text}" for letter, text in zip(PASSAGE_LETTERS, texts))
