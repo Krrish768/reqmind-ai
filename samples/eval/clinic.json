@@ -1,0 +1,133 @@
+{
+ "name": "clinic",
+ "title": "Clinic Appointment App",
+ "lines": [
+  {
+   "text": "Clinic Appointment App - Requirements",
+   "id": null
+  },
+  {
+   "text": "1. Background",
+   "id": null
+  },
+  {
+   "text": "Patients now call the front desk to book, and the lines are busy most mornings.",
+   "id": null
+  },
+  {
+   "text": "Most patients will use the app on their phones.",
+   "id": null
+  },
+  {
+   "text": "2. Booking",
+   "id": null
+  },
+  {
+   "text": "- Patients shall book an appointment with any doctor who has a free slot.",
+   "id": "H1",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- Each appointment slot shall be 15 minutes long.",
+   "id": "H2",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- Patients can cancel an appointment up to 2 hours before it starts.",
+   "id": "H3",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- The system must send an SMS reminder 24 hours before the appointment.",
+   "id": "H4",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- A patient may cancel an appointment up to 6 hours before it starts.",
+   "id": "H5",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "3. Doctors",
+   "id": null
+  },
+  {
+   "text": "- Doctors shall see their schedule for the next 7 days.",
+   "id": "H6",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- Doctors are able to block slots when they are on leave.",
+   "id": "H7",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- For senior doctors, each appointment slot shall be 20 minutes long.",
+   "id": "H8",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "4. Quality",
+   "id": null
+  },
+  {
+   "text": "- Patient records must be encrypted at rest.",
+   "id": "H9",
+   "type": "non_functional",
+   "vague": false
+  },
+  {
+   "text": "- The booking page should load quickly on slow networks.",
+   "id": "H10",
+   "type": "non_functional",
+   "vague": true
+  },
+  {
+   "text": "- The app shall follow the national health data rules.",
+   "id": "H11",
+   "type": "constraint",
+   "vague": false
+  },
+  {
+   "text": "- The system shall be available 99.9% of the time.",
+   "id": "H12",
+   "type": "non_functional",
+   "vague": false
+  }
+ ],
+ "conflicts": [
+  [
+   "H3",
+   "H5"
+  ]
+ ],
+ "lookalikes": [
+  [
+   "H2",
+   "H8"
+  ]
+ ],
+ "questions": [
+  {
+   "question": "How long before the appointment is the SMS reminder sent?",
+   "expect_any": [
+    "24"
+   ]
+  },
+  {
+   "question": "How long is one appointment slot?",
+   "expect_any": [
+    "15",
+    "20"
+   ]
+  }
+ ]
+}
