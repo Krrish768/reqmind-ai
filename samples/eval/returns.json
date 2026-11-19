@@ -1,0 +1,117 @@
+{
+ "name": "returns",
+ "title": "ShopEasy Returns Module",
+ "lines": [
+  {
+   "text": "ShopEasy Returns Module - Requirements",
+   "id": null
+  },
+  {
+   "text": "1. Overview",
+   "id": null
+  },
+  {
+   "text": "Customers often return clothes because of size problems.",
+   "id": null
+  },
+  {
+   "text": "2. Returns",
+   "id": null
+  },
+  {
+   "text": "- Customers shall request a return within 30 days of delivery.",
+   "id": "S1",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- The system shall create a pickup request after a return is approved.",
+   "id": "S2",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- Refunds are sent to the original payment method.",
+   "id": "S3",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- Customers shall request a return within 15 days of delivery.",
+   "id": "S4",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- The refund shall reach the customer within 7 working days.",
+   "id": "S5",
+   "type": "non_functional",
+   "vague": false
+  },
+  {
+   "text": "- Sale items cannot be returned.",
+   "id": "S6",
+   "type": "constraint",
+   "vague": false
+  },
+  {
+   "text": "- The returns page should be simple and clear.",
+   "id": "S7",
+   "type": "non_functional",
+   "vague": true
+  },
+  {
+   "text": "3. Admin",
+   "id": null
+  },
+  {
+   "text": "- Admins shall approve or reject each return request.",
+   "id": "S8",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- Admins should see a weekly report of return reasons.",
+   "id": "S9",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "- The module must work with the existing payment gateway API.",
+   "id": "S10",
+   "type": "constraint",
+   "vague": false
+  },
+  {
+   "text": "- The system will log every change to a return request.",
+   "id": "S11",
+   "type": "functional",
+   "vague": false
+  },
+  {
+   "text": "Note: the team will review these rules after the festive sale.",
+   "id": null
+  }
+ ],
+ "conflicts": [
+  [
+   "S1",
+   "S4"
+  ]
+ ],
+ "lookalikes": [],
+ "questions": [
+  {
+   "question": "Within how many days does the refund reach the customer?",
+   "expect_any": [
+    "7"
+   ]
+  },
+  {
+   "question": "Where is the refund sent?",
+   "expect_any": [
+    "original payment"
+   ]
+  }
+ ]
+}
