@@ -5,14 +5,14 @@
 | Metric | Text rules | qwen3:8b |
 |---|---|---|
 | Labelled requirements | 65 | 65 |
-| Found | 62 | 66 |
-| Correct | 60 | 65 |
+| Found | 62 | 64 |
+| Correct | 60 | 63 |
 | Extra (not a requirement) | 2 | 1 |
-| Missed | 5 | 0 |
-| Precision | 0.968 | 0.985 |
-| Recall | 0.923 | 1.0 |
-| F1 | 0.945 | 0.992 |
-| Type accuracy (on correct ones) | 0.7 | 0.785 |
+| Missed | 5 | 2 |
+| Precision | 0.968 | 0.984 |
+| Recall | 0.923 | 0.969 |
+| F1 | 0.945 | 0.976 |
+| Type accuracy (on correct ones) | 0.7 | 0.794 |
 
 ### Vague wording
 
@@ -29,8 +29,8 @@
 | Metric | Text rules | qwen3:8b |
 |---|---|---|
 | Labelled conflicts | 5 | 5 |
-| Found | 4 | 5 |
-| Missed | 1 | 0 |
+| Found | 4 | 4 |
+| Missed | 1 | 1 |
 | False alarms | 3 | 0 |
 | Look-alike pairs reported as conflicts | 3 | 0 |
 | Look-alike pairs in total | 3 | 3 |
@@ -39,17 +39,17 @@
 
 | Metric | Text rules | qwen3:8b |
 |---|---|---|
-| Seconds per document | 0.0 | 107.9 |
+| Seconds per document | 0.0 | 110.0 |
 
 ### Chat
 
 | Metric | qwen3:8b |
 |---|---|
 | Questions | 10 |
-| Passed the grounding check | 3 |
-| Right answer | 3 |
-| Seconds per question | 2.9 |
+| Passed the grounding check | 10 |
+| Right answer | 9 |
+| Seconds per question | 1.3 |
 
-Peak GPU memory during the LLM run: 5920 MiB on NVIDIA GeForce RTX 4060 Laptop GPU.
+Peak GPU memory during the LLM run: 5922 MiB on NVIDIA GeForce RTX 4060 Laptop GPU.
 
-Source runs: `results/evaluation/rules/20261119_221319`, `results/evaluation/llm/20261119_222247`.
+Source runs: `results/evaluation/rules/20261119_222952`, `results/evaluation/llm/20261119_223915`.
