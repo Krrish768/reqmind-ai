@@ -4,8 +4,10 @@ import pytest
 from backend.app.agents import conflicts, extraction
 from backend.app.agents.workflow import LLM_DOWN_NOTE, run_workflow
 from backend.app.llm import client as llm
+from backend.app.rag.chat import answer_errors
 from backend.app.schemas import (
     ChunkIn,
+    LlmChatAnswer,
     LlmConflictVerdict,
     LlmExtraction,
     LlmRequirement,
@@ -113,3 +115,12 @@ def test_section_heading_is_not_used_as_title() -> None:
     long_quote = "The system shall accept payments through UPI using the payment gateway for every order."
     expected = "Accept payments through UPI using the payment gateway"
     assert extraction.checked_title(long_quote, long_quote, chunk_text) == expected
+
+
+def test_chat_answer_letters_are_checked() -> None:
+    passages = [{"text": "2. Accounts - A session shall expire after 15 minutes."}]
+    assert answer_errors(LlmChatAnswer(answer="After 15 minutes.", passages=["A"]), passages) == []
+    assert answer_errors(LlmChatAnswer(answer="After 15 minutes.", passages=["passage a"]), passages) == []
+    assert answer_errors(LlmChatAnswer(answer="After 15 minutes.", passages=["B"]), passages)
+    assert answer_errors(LlmChatAnswer(answer="After 45 minutes.", passages=["A"]), passages)
+    assert answer_errors(LlmChatAnswer(answer="The documents do not say.", passages=[]), passages) == []
